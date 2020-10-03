@@ -56,6 +56,17 @@ runDaikon {
 }
 ```
 
+Your `settings.gradle` file must contain:
+
+```
+pluginManagement {
+    repositories {
+        mavenLocal()
+        gradlePluginPortal()
+    }
+}
+```
+
 ## Task
 
 * `daikonRun` - runs Daikon workflow'.
