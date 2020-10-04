@@ -1,22 +1,19 @@
 package com.sri.gradle.tasks;
 
-import com.sri.gradle.Options;
+import com.sri.gradle.Constants;
 import com.sri.gradle.internal.Chicory;
 import com.sri.gradle.internal.Daikon;
 import com.sri.gradle.internal.DynComp;
+import com.sri.gradle.internal.Tool;
 import com.sri.gradle.utils.Filefinder;
-import com.sri.gradle.utils.ImmutableStream;
+import com.sri.gradle.utils.MoreFiles;
 import java.io.File;
-import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 public class TaskExecutorImpl implements TaskExecutor {
-  static final String TEST_DRIVER = "TestDriver";
 
   private final List<Throwable> encounteredErrors;
   private final List<TaskBuilderImpl> workBuilders;
@@ -27,7 +24,9 @@ public class TaskExecutorImpl implements TaskExecutor {
   }
 
   @Override public void addError(Throwable cause) {
-    Optional.ofNullable(cause).ifPresent(this.encounteredErrors::add);
+    if (cause != null){
+      this.encounteredErrors.add(cause);
+    }
   }
 
   @Override public TaskBuilder runDaikonOn(File testClassesDir) {
@@ -45,7 +44,7 @@ public class TaskExecutorImpl implements TaskExecutor {
 
     for (TaskBuilderImpl each : workBuilders){
       // a work builder configures a work executor
-      // so now we apply this configuration
+      // by applying a task configuration to it.
       applyBuiltConfiguration(each);
     }
   }
@@ -56,10 +55,10 @@ public class TaskExecutorImpl implements TaskExecutor {
     final List<URL> classpath = each.getClasspath();
 
     final List<File>    allTestClasses  = Filefinder.findJavaClasses(classesDir);
-    final List<String>  allQualifiedClasses = getFullyQualifiedNames(allTestClasses);
+    final List<String>  allQualifiedClasses = MoreFiles.getFullyQualifiedNames(allTestClasses);
 
     String mainClass  = allQualifiedClasses.stream()
-        .filter(f -> f.endsWith(TEST_DRIVER))
+        .filter(f -> f.endsWith(Constants.TEST_DRIVER))
         .findFirst().orElse(null);
 
     if(mainClass == null){
@@ -67,7 +66,7 @@ public class TaskExecutorImpl implements TaskExecutor {
       return;
     }
 
-    mainClass = mainClass.replace(".class", "");
+    mainClass = mainClass.replace(".class", Constants.EMPTY_STRING);
 
     final String prefix = mainClass.substring(mainClass.lastIndexOf('.') + 1);
 
@@ -77,63 +76,39 @@ public class TaskExecutorImpl implements TaskExecutor {
   }
 
   private static void executeDaikon(String mainClass, String namePrefix, List<URL> classpath, Path outputDir) {
-    final Daikon daikon = new Daikon()
+    final Tool daikon = new Daikon()
         .setClasspath(classpath)
         .setWorkingDirectory(outputDir)
+        .setMainClass(mainClass)
         .setDtraceFile(outputDir, namePrefix + ".dtrace.gz")
         .setStandardOutput(namePrefix + ".inv.gz");
-    final List<String> output = daikon.execute();
-    if (!output.isEmpty()){
-      output.forEach(System.out::println);
-    }
+
+    daikon.execute();
   }
 
   private static void executeChicory(String mainClass, String namePrefix, List<String> allQualifiedClasses,
       List<URL> classpath, Path outputDir) {
-    final Chicory chicory = new Chicory()
+    final Tool chicory = new Chicory()
         .setClasspath(classpath)
+        .setWorkingDirectory(outputDir)
         .setMainClass(mainClass)
-        .selectedClasses(allQualifiedClasses)
+        .setSelectedClasses(allQualifiedClasses)
         .setOutputDirectory(outputDir)
-        .setComparabilityFile(outputDir, namePrefix + ".decls-DynComp")
-        .setWorkingDirectory(outputDir);
+        .setComparabilityFile(outputDir, namePrefix + ".decls-DynComp");
 
-    final List<String> output = chicory.execute();
-    if (!output.isEmpty()){
-      output.forEach(System.out::println);
-    }
+    chicory.execute();
   }
 
   private static void executeDynComp(String mainClass, List<String> allQualifiedClasses,
       List<URL> classpath, Path outputDir) {
-    final DynComp dynComp = new DynComp()
+    final Tool dynComp = new DynComp()
         .setClasspath(classpath)
+        .setWorkingDirectory(outputDir)
         .setMainClass(mainClass)
         .selectedClasses(allQualifiedClasses)
-        .setOutputDirectory(outputDir)
-        .setWorkingDirectory(outputDir);
-    final List<String> output = dynComp.execute();
-    if (!output.isEmpty()){
-      output.forEach(System.out::println);
-    }
-  }
+        .setOutputDirectory(outputDir);
 
-
-  public static List<String> getFullyQualifiedNames(List<File> javaFiles){
-    return ImmutableStream.listCopyOf(javaFiles.stream().map(f -> {
-      try {
-        final String canonicalPath = f.getCanonicalPath();
-        final String deletingPrefix = canonicalPath
-            .substring(0, f.getCanonicalPath().indexOf(Options.PROJECT_TEST_CLASS_DIR.value())) + Options.PROJECT_TEST_CLASS_DIR.value()
-            + "/";
-
-        return canonicalPath.replace(deletingPrefix, "")
-            .replaceAll(".class","")
-            .replaceAll("/",".");
-      } catch (IOException ignored){}
-      return null;
-    }).filter(Objects::nonNull));
-
+    dynComp.execute();
   }
 
 }

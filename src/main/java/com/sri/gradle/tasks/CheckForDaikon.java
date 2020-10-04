@@ -1,6 +1,6 @@
 package com.sri.gradle.tasks;
 
-import com.sri.gradle.Options;
+import com.sri.gradle.Constants;
 import com.sri.gradle.internal.Daikon;
 import java.io.File;
 import org.gradle.api.GradleException;
@@ -8,10 +8,10 @@ import org.gradle.api.tasks.TaskAction;
 
 public class CheckForDaikon extends AbstractNamedTask {
 
-  @TaskAction public void checkForDaikon(){
+  @TaskAction public void daikonCheck() {
     try {
       final File daikonJar = getJarfile(
-          Options.DAIKON_JAR_FILE
+          Constants.DAIKON_JAR_FILE
       );
 
       new Daikon()
@@ -19,14 +19,18 @@ public class CheckForDaikon extends AbstractNamedTask {
           .help()
           .execute();
 
-    } catch (Exception e){
-      throw new GradleException(UNEXPECTED_ERROR);
+    } catch (Exception e) {
+      throw new GradleException(Constants.UNEXPECTED_ERROR);
     }
 
 
   }
 
+  @Override protected String getTaskDescription() {
+    return Constants.CHECK_DAIKON_TASK_DESCRIPTION;
+  }
+
   @Override protected String getTaskName() {
-    return "checkForDaikon";
+    return Constants.CHECK_DAIKON_TASK;
   }
 }

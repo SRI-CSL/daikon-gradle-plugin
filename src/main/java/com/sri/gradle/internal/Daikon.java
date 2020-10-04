@@ -1,6 +1,6 @@
 package com.sri.gradle.internal;
 
-import com.sri.gradle.Options;
+import com.sri.gradle.Constants;
 import com.sri.gradle.utils.ImmutableStream;
 import java.io.File;
 import java.net.URL;
@@ -14,31 +14,7 @@ public class Daikon extends AbstractTool {
     super();
   }
 
-  @Override public Daikon setToolJar(File toolJar){
-    return (Daikon) super.setToolJar(toolJar);
-  }
-
-  public Daikon setStandardOutput(String filename) {
-    args(String.format("-o %s", filename));
-
-    return this;
-  }
-
-  @Override public Daikon setClasspath(List<URL> classpathUrls) {
-    return (Daikon) super.setClasspath(classpathUrls);
-  }
-
-  @Override public Daikon setWorkingDirectory(Path directory) {
-    return (Daikon) super.setWorkingDirectory(directory);
-  }
-
-  public Daikon setDtraceFile(Path directory, String filename) {
-    final Path resolved = directory.resolve(filename);
-    args(String.format("%s", resolved));
-    return this;
-  }
-
-  @Override public List<String> execute() throws ToolException {
+  @Override public void execute() throws ToolException {
     try {
       final String classPath = getClasspath().stream()
           .map(URL::toString)
@@ -46,20 +22,18 @@ public class Daikon extends AbstractTool {
 
       List<String> output = getBuilder()
           .arguments("-classpath", classPath)
-          .arguments(Options.DAIKON_MAIN_CLASS.value())
+          .arguments(Constants.DAIKON_MAIN_CLASS)
           .arguments(getArgs())
           .execute();
 
       List<String> err = ImmutableStream.listCopyOf(output.stream()
           .filter(Objects::nonNull)
-          .filter(s -> s.startsWith("Error: Could not find or load main")));
+          .filter(s -> s.startsWith(Constants.ERROR_MARKER)));
 
-      if (!err.isEmpty()) throw new ToolException(BAD_DAIKON_ERROR);
-
-      return output;
+      if (!err.isEmpty()) throw new ToolException(Constants.BAD_DAIKON_ERROR);
 
     } catch (Exception e){
-      throw new ToolException(BAD_DAIKON_ERROR, e);
+      throw new ToolException(Constants.BAD_DAIKON_ERROR, e);
     }
   }
 

@@ -2,9 +2,13 @@ package com.sri.gradle;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertThat;
 
 import com.sri.gradle.utils.Command;
 import com.sri.gradle.utils.Filefinder;
+import com.sri.gradle.utils.MoreFiles;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
@@ -25,5 +29,15 @@ public class DaikonPluginTest {
         Command.create().arguments("ls").permitNonZeroExitStatus().execute();
 
     assertThat("filesAvailable=" + filesAvailable, filesAvailable.size(), is(9));
+  }
+
+  @Test
+  public void testFQNExtractor() {
+    final String canonicalPath =
+        "daikon-gradle-plugin/consumer/build/classes/java/test/com/foo/FooStuffTestDriver.class";
+    final String fqn = MoreFiles.getFullyQualifiedName(canonicalPath);
+
+    assertNotNull(fqn);
+    assertEquals("com.foo.FooStuffTestDriver", fqn);
   }
 }

@@ -1,5 +1,6 @@
 package com.sri.gradle.utils;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Command {
 
@@ -58,13 +58,18 @@ public class Command {
 
   /**
    * Creates a Command.Builder object
+   * @return self to facilitate method chaining
    */
   public static Builder create() {
     return create(System.out, System.err);
   }
 
   /**
-   * Creates a Command.Builder object
+   * Creates a Command.Builder object.
+   *
+   * @param stdout standard output
+   * @param stderr standard error output
+   * @return self to facilitate method chaining
    */
   public static Builder create(PrintStream stdout, PrintStream stderr) {
     return new Builder(stdout, stderr);
@@ -115,7 +120,8 @@ public class Command {
   }
 
   /**
-   * Returns the output returned by process.
+   * Reads from standard input and writes to standard output.
+   * Once the process completes, the command's output is returned.
    *
    * @return the output on terminal.
    * @throws IOException          unexpected behavior occurred.
@@ -167,10 +173,17 @@ public class Command {
   }
 
   @Override public String toString() {
-    final String entrySetAsString = environment.entrySet().stream().map(Object::toString)
-        .collect(Collectors.joining(" "));
-    String envString = !environment.isEmpty() ? (entrySetAsString + " ") : "";
-    return envString + String.join(" ", args);
+
+    MoreObjects.ToStringHelper toString =  MoreObjects.toStringHelper(this);
+    for (String eachKey : environment.keySet()){
+      toString = toString.add(eachKey, environment.get(eachKey));
+    }
+
+    for (String eachArg : args){
+      toString = toString.addValue(eachArg);
+    }
+
+    return toString.toString();
 
   }
 
@@ -339,7 +352,9 @@ public class Command {
       }
 
       for (String outputLine : outputLines) {
-        result.append("\n  ").append(outputLine);
+        result.append(System.lineSeparator())
+            .append("  ")
+            .append(outputLine);
       }
 
       return result.toString();
