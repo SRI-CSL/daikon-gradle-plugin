@@ -63,14 +63,17 @@ public class RunDaikon extends AbstractNamedTask {
 
     final RunDaikonConfiguration config = new RunDaikonConfiguration(inputDir, classpath,
         outputDir);
-    getLogger().quiet("Created RunDaikon task configuration");
+    getLogger().debug("Created RunDaikon task configuration");
 
     executor.install(config);
-    getLogger().quiet("Configured RunDaikon task");
+    getLogger().debug("Configured RunDaikon task");
 
-    getLogger().quiet("About to execute task");
+    getLogger().debug("About to execute task");
     executor.execute();
-    getLogger().quiet("Successfully executed task");
+
+    getLogger().debug("Successfully executed task");
+
+    getLogger().quiet(Constants.SUCCESSFUL_EXECUTION);
   }
 
   @OutputDirectory public DirectoryProperty getOutputDir() {
