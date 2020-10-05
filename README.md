@@ -71,7 +71,6 @@ pluginManagement {
 
 * `daikonRun` - runs Daikon workflow'.
 
-## Configuration
 
 ## License
 
