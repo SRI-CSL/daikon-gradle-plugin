@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 import org.gradle.api.GradleException;
+import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
@@ -21,12 +22,14 @@ public class RunDaikon extends AbstractNamedTask {
   private final DirectoryProperty outputDir;
   private final DirectoryProperty requires;
   private final Property<String> testDriverPackage;
+  private final Property<Boolean> generateTestDriver;
 
   @SuppressWarnings("UnstableApiUsage")
   public RunDaikon() {
     this.outputDir = getProject().getObjects().directoryProperty(); // unchecked warning
     this.requires = getProject().getObjects().directoryProperty();  // unchecked warning
     this.testDriverPackage = getProject().getObjects().property(String.class); // unchecked warning
+    this.generateTestDriver = getProject().getObjects().property(Boolean.class); // unchecked warning
   }
 
   @TaskAction public void daikonRun() {
@@ -61,28 +64,40 @@ public class RunDaikon extends AbstractNamedTask {
       }
     }
 
-    final RunDaikonConfiguration config = new RunDaikonConfiguration(inputDir, classpath,
-        outputDir);
-    getLogger().quiet("Created RunDaikon task configuration");
+    // If a test driver is needed, fetch the testDriverPackage value; otherwise fetch a null value
+    final String testDriverPackage = getGenerateTestDriver().get() ? getTestDriverPackage().get() : null;
 
+    final RunDaikonConfiguration config = new RunDaikonConfiguration(
+        inputDir,
+        testDriverPackage,
+        getProject(),
+        classpath,
+        outputDir
+    );
+
+    getLogger().debug("Created RunDaikon task configuration");
     executor.install(config);
-    getLogger().quiet("Configured RunDaikon task");
+    getLogger().debug("Configured RunDaikon task");
 
-    getLogger().quiet("About to execute task");
+    getLogger().debug("About to execute task");
     executor.execute();
-    getLogger().quiet("Successfully executed task");
+    getLogger().debug("Successfully executed task");
   }
 
   @OutputDirectory public DirectoryProperty getOutputDir() {
     return this.outputDir;
   }
 
+  @InputDirectory public DirectoryProperty getRequires() {
+    return this.requires;
+  }
+
   @Input public Property<String> getTestDriverPackage() {
     return this.testDriverPackage;
   }
 
-  @InputDirectory public DirectoryProperty getRequires() {
-    return this.requires;
+  @Input public Property<Boolean> getGenerateTestDriver() {
+    return this.generateTestDriver;
   }
 
   @Override protected String getTaskName() {
@@ -96,19 +111,25 @@ public class RunDaikon extends AbstractNamedTask {
   static class RunDaikonConfiguration extends AbstractConfiguration {
 
     private final File inputDir;
+    private final String testDriverPackage;
+    private final Project project;
     private final List<File> classpath;
     private final File outputDir;
 
-    RunDaikonConfiguration(File inputDir, List<File> classpath, File outputDir) {
+    RunDaikonConfiguration(File inputDir, String testDriverPackage, Project project, List<File> classpath, File outputDir) {
       this.inputDir = inputDir;
+      this.testDriverPackage = testDriverPackage;
+      this.project = project;
       this.classpath = classpath;
       this.outputDir = outputDir;
     }
 
     @Override protected void configure() {
-      runDaikonOn(inputDir)
-          .withClasspath(classpath)
-          .toDir(outputDir);
+      TaskBuilder builder = testDriverPackage == null
+          ? runDaikonOn(new InputProviderImpl(2, inputDir, project))
+          : runDaikonOn(new InputProviderImpl(3, inputDir, testDriverPackage, project));
+
+      builder.withClasspath(classpath).toDir(outputDir);
     }
   }
 
@@ -132,10 +153,10 @@ public class RunDaikon extends AbstractNamedTask {
     protected abstract void configure();
 
     /**
-     * @see TaskExecutor#runDaikonOn(File)
+     * @see TaskExecutor#runDaikonOn(InputProvider)
      */
-    protected TaskBuilder runDaikonOn(File testClassesDir) {
-      return executor.runDaikonOn(testClassesDir);
+    protected TaskBuilder runDaikonOn(InputProvider inputProvider) {
+      return executor.runDaikonOn(inputProvider);
     }
 
     /**

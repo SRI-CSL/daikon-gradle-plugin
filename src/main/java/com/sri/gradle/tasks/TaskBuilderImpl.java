@@ -1,44 +1,76 @@
 package com.sri.gradle.tasks;
 
+import com.google.common.base.Predicates;
 import com.sri.gradle.utils.Urls;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
+import org.gradle.api.Project;
 
 public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
 
   private final TaskExecutorImpl executor;
 
-  private final Path testClassesDir;
+  private final File testClassesDir;
   private Path outputDir;
+  private final String testDriverPackage;
+  private final Project gradleProject;
 
   private final List<URL> classpathUrls;
 
-  public TaskBuilderImpl(Path testClassesDir, TaskExecutorImpl executor){
+  public TaskBuilderImpl(InputProvider provider, TaskExecutorImpl executor){
+    // TODO(has) consider re-designing InputProvider's API. Fetching
+    //  its members should be simpler than this.
+    final File testClassesDir = Arrays.stream(provider.get())
+        .filter(Predicates.instanceOf(File.class))
+        .map(o -> (File) o).findFirst()
+        .orElse(null);
+
+    final String testDriverPackage = Arrays.stream(provider.get())
+        .filter(Predicates.instanceOf(String.class))
+        .map(Object::toString).findFirst()
+        .orElse(null);
+
+    final Project gradleProject = Arrays.stream(provider.get())
+        .filter(Predicates.instanceOf(Project.class))
+        .map(o -> (Project)o).findFirst()
+        .orElse(null);
+
     this.executor = executor;
     this.testClassesDir = testClassesDir;
     this.outputDir = null;
     this.classpathUrls = new LinkedList<>();
-  }
-
-  public Path getTestClassesDir(){
-    return testClassesDir;
-  }
-
-  public Path getOutputDir(){
-    return outputDir;
+    this.testDriverPackage = testDriverPackage;
+    this.gradleProject = gradleProject;
   }
 
   public List<URL> getClasspath(){
     return classpathUrls;
   }
 
+  public Project getGradleProject(){
+    return gradleProject;
+  }
+
+  public Path getOutputDir(){
+    return outputDir;
+  }
+
+  public File getTestClassesDir(){
+    return testClassesDir;
+  }
+
+  public String getTestDriverPackage(){
+    return testDriverPackage;
+  }
+
   @Override public void toDir(File outputDir) {
 
-    if (getTestClassesDir() == null || !Files.exists(getTestClassesDir())){
+    if (getTestClassesDir() == null || !Files.exists(getTestClassesDir().toPath())){
       executor.addError(new NullPointerException("input directory is null or does not exist"));
       return;
     }

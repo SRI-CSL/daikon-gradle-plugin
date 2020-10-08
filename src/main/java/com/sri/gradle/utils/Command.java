@@ -11,6 +11,8 @@ import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -185,6 +187,31 @@ public class Command {
 
     return toString.toString();
 
+  }
+
+
+  /**
+   * Implements a generic method for joining a collection of objects. This
+   * method is intended to work on Java6+ versions.
+   *
+   * @param delimiter delimiter between entries in a collection.
+   * @param data collection to join using a given delimiter.
+   * @param <T> element type
+   * @return joined collection represented as a String
+   */
+  public static <T> String joinCollection(String delimiter, Collection<T> data){
+    final Iterator<T> iterator = data.iterator();
+    final StringBuilder stringBuilder = new StringBuilder();
+
+    if (iterator.hasNext()) {
+      stringBuilder.append(iterator.next());
+
+      while (iterator.hasNext()) {
+        stringBuilder.append(delimiter).append(iterator.next());
+      }
+    }
+
+    return stringBuilder.toString();
   }
 
   /**

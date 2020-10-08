@@ -27,9 +27,10 @@ public class DaikonPlugin implements Plugin<Project> {
     // TODO(has) consider removing this task dependency. Not sure if it's needed.
     mainTask.dependsOn(Constants.ASSEMBLE_TASK);
 
-    mainTask.getRequires().set(extension.getRequires());
     mainTask.getOutputDir().set(extension.getOutputDir());
+    mainTask.getRequires().set(extension.getRequires());
     mainTask.getTestDriverPackage().set(extension.getTestDriverPackage());
+    mainTask.getGenerateTestDriver().set(extension.getGenerateTestDriver().getOrElse(false));
 
     return mainTask;
   }
