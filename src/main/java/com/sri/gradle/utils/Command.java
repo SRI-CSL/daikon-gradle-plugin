@@ -248,7 +248,7 @@ public class Command {
     }
 
     /**
-     * Sets an environment's variable.
+     * Sets an environment variable.
      *
      * @param key   key identifying the variable
      * @param value the value of the variable

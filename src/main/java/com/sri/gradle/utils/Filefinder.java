@@ -26,7 +26,7 @@ public class Filefinder {
    *
    * @param directory directory to access
    * @param exclude hints for files to be excluded in the directory.
-   * @return the list of files matching a given extension.
+   * @return the list of files ending with ".java"
    */
   public static List<File> findJavaFiles(Path directory, String... exclude){
     if (!Files.exists(directory)) return ImmutableList.of();
@@ -40,7 +40,7 @@ public class Filefinder {
    *
    * @param directory directory to access
    * @param exclude hints for files to be excluded in the directory.
-   * @return the list of files matching a given extension.
+   * @return the list of files ending with ".class"
    */
   public static List<File> findJavaClasses(Path directory, String... exclude){
     if (!Files.exists(directory)) return ImmutableList.of();
@@ -54,7 +54,7 @@ public class Filefinder {
    *
    * @param directory directory to access
    * @param exclude hints for files to be excluded in the directory.
-   * @return the list of files matching a given extension.
+   * @return the list of files ending with ".jar"
    */
   public static List<File> findJavaJars(Path directory, String... exclude){
     if (!Files.exists(directory)) return ImmutableList.of();
@@ -68,8 +68,8 @@ public class Filefinder {
    *
    * @param directory directory to access
    * @param matcher file matching strategy
-   * @param skipHints keywords used to avoid certain files collection.
-   * @return the list of files matching a given extension.
+   * @param skipHints keywords used to avoid certain files collection
+   * @return the list of files matching the given matcher
    */
   private static List<File> findFiles(File directory, final Dot matcher, String... skipHints){
 

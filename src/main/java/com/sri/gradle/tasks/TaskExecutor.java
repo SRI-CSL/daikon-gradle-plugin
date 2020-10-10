@@ -8,7 +8,7 @@ import java.util.Formatter;
 import java.util.List;
 
 /**
- * Wraps DyComp, Chicory, and Daikon into a single task:
+ * Wraps DynComp, Chicory, and Daikon into a single task:
  *
  * runDaikonOn(path/to/test/classes)
  *  .withClasspath(file1, file2, ...)
