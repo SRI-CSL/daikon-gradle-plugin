@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Set;
 
 public class Filefinder {
-  private Filefinder(){}
+  private Filefinder() {}
 
   /**
    * List all Java files found in a directory. Skip those ones matching
@@ -26,9 +26,9 @@ public class Filefinder {
    *
    * @param directory directory to access
    * @param exclude hints for files to be excluded in the directory.
-   * @return the list of files matching a given extension.
+   * @return the list of files ending with ".java"
    */
-  public static List<File> findJavaFiles(Path directory, String... exclude){
+  public static List<File> findJavaFiles(Path directory, String... exclude) {
     if (!Files.exists(directory)) return ImmutableList.of();
 
     return findFiles(directory.toFile(), Dot.JAVA, exclude);
@@ -40,9 +40,9 @@ public class Filefinder {
    *
    * @param directory directory to access
    * @param exclude hints for files to be excluded in the directory.
-   * @return the list of files matching a given extension.
+   * @return the list of files ending with ".class"
    */
-  public static List<File> findJavaClasses(Path directory, String... exclude){
+  public static List<File> findJavaClasses(Path directory, String... exclude) {
     if (!Files.exists(directory)) return ImmutableList.of();
 
     return findFiles(directory.toFile(), Dot.CLASS, exclude);
@@ -54,9 +54,9 @@ public class Filefinder {
    *
    * @param directory directory to access
    * @param exclude hints for files to be excluded in the directory.
-   * @return the list of files matching a given extension.
+   * @return the list of files ending with ".jar"
    */
-  public static List<File> findJavaJars(Path directory, String... exclude){
+  public static List<File> findJavaJars(Path directory, String... exclude) {
     if (!Files.exists(directory)) return ImmutableList.of();
 
     return findFiles(directory.toFile(), Dot.JAR, exclude);
@@ -68,10 +68,10 @@ public class Filefinder {
    *
    * @param directory directory to access
    * @param matcher file matching strategy
-   * @param skipHints keywords used to avoid certain files collection.
-   * @return the list of files matching a given extension.
+   * @param skipHints keywords used to avoid certain files collection
+   * @return the list of files matching the given matcher
    */
-  private static List<File> findFiles(File directory, final Dot matcher, String... skipHints){
+  private static List<File> findFiles(File directory, final Dot matcher, String... skipHints) {
 
     try {
       return ImmutableList.copyOf(
@@ -102,16 +102,17 @@ public class Filefinder {
     final Set<String> excluded = ImmutableSet.copyOf(Arrays.asList(keywords));
 
     try {
-      Files.walkFileTree(start, new SimpleFileVisitor<Path>(){
-        @Override public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+      Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
+        @Override
+        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
 
           final Path fileName = file.getFileName();
 
-          if(matcher.matches(fileName)){
+          if (matcher.matches(fileName)) {
             final File visitedFile = file.toFile();
             final String name = visitedFile.getName().replace(("." + matcher.getExt()), "");
 
-            if(!isExcluded(name, excluded)){
+            if (!isExcluded(name, excluded)) {
               files.add(visitedFile);
             }
           }
@@ -142,20 +143,20 @@ public class Filefinder {
     private final PathMatcher matcher;
     private final String ext;
 
-    Dot(PathMatcher matcher, String ext){
+    Dot(PathMatcher matcher, String ext) {
       this.matcher = matcher;
       this.ext = ext;
     }
 
-    boolean matches(Path file){
+    boolean matches(Path file) {
       return getMatcher().matches(file);
     }
 
-    PathMatcher getMatcher(){
+    PathMatcher getMatcher() {
       return this.matcher;
     }
 
-    String getExt(){
+    String getExt() {
       return ext;
     }
   }

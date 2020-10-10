@@ -18,31 +18,34 @@ public class TaskExecutorImpl implements TaskExecutor {
   private final List<Throwable> encounteredErrors;
   private final List<TaskBuilderImpl> workBuilders;
 
-  public TaskExecutorImpl(){
+  public TaskExecutorImpl() {
     this.encounteredErrors = new LinkedList<>();
     this.workBuilders = new LinkedList<>();
   }
 
-  @Override public void addError(Throwable cause) {
-    if (cause != null){
+  @Override
+  public void addError(Throwable cause) {
+    if (cause != null) {
       this.encounteredErrors.add(cause);
     }
   }
 
-  @Override public TaskBuilder runDaikonOn(File testClassesDir) {
+  @Override
+  public TaskBuilder runDaikonOn(File testClassesDir) {
     final TaskBuilderImpl builder = new TaskBuilderImpl(testClassesDir.toPath(), this);
     workBuilders.add(builder);
     return builder;
   }
 
-  @Override public void execute() throws TaskConfigurationError {
+  @Override
+  public void execute() throws TaskConfigurationError {
 
     // Blow up if we encountered errors.
     if (!encounteredErrors.isEmpty()) {
       throw new TaskConfigurationError(encounteredErrors);
     }
 
-    for (TaskBuilderImpl each : workBuilders){
+    for (TaskBuilderImpl each : workBuilders) {
       // a work builder configures a work executor
       // by applying a task configuration to it.
       applyBuiltConfiguration(each);

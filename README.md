@@ -1,15 +1,18 @@
 # Daikon Gradle Plugin
 (experimental) daikon gradle plugin
 
-This Gradle plug-in creates a task to run [Daikon](https://plse.cs.washington.edu/daikon/) on Java projects.
+This Gradle plug-in creates a task, `daikonRun`, that runs [Daikon](https://plse.cs.washington.edu/daikon/) on Java projects.
+
+TODO: Document what runs the plugin uses for Daikon.  Is it all test runs?
+
 
 ## Configuration
 
-To use this plug-in, [you must have downloaded Daikon and have it as dependency](https://plse.cs.washington.edu/daikon/download/).
+To use this plug-in, Daikon should be in the `libs` directory (TODO: is it OK for it to be anywhere on the classpath?) and it should be a `file` dependency in your `build.gradle` file.
 
 ### Configuring your project
 
-Add the plug-in dependency and apply it to the root project's `build.gradle`:
+Add the following to the `build.gradle` file of the project that applies the plugin:
 
 ```groovy
 plugins {
@@ -17,11 +20,7 @@ plugins {
     id 'maven-publish'
     id 'com.sri.gradle.daikon' version '0.0.1-SNAPSHOT'
 }
-```
 
-Make sure you have also declared the following repositories and dependencies on your `build.gradle` file:
-
-```groovy
 repositories {
     mavenLocal()
     mavenCentral()
@@ -36,13 +35,6 @@ dependencies {
     testImplementation 'junit:junit:4.13'
 }
 ```
-
-Note: The Daikon Gradle Plugin uses Guava's immutable collection classes. 
-
-
-### Configuring the Daikon plugin
-
-In the `build.gradle` of the project that applies the plugin:
 
 ```groovy
 runDaikon {
@@ -66,11 +58,6 @@ pluginManagement {
     }
 }
 ```
-
-## Task
-
-* `daikonRun` - runs Daikon workflow'.
-
 
 ## License
 

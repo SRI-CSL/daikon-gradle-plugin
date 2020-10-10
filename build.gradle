@@ -25,7 +25,7 @@ gradlePlugin {
         daikonPlugin {
             id = 'com.sri.gradle.daikon'
             displayName = 'Daikon Gradle Plugin'
-            description = 'Dynamic identification of likely program invariants'
+            description = 'Dynamic detection of likely program invariants'
             implementationClass = 'com.sri.gradle.DaikonPlugin'
         }
     }

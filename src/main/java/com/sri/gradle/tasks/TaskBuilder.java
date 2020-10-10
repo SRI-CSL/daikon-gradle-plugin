@@ -19,7 +19,7 @@ public interface TaskBuilder {
    * @param files additional files
    * @return a reference to the task builder
    */
-  default OutputBuilder withClasspath(File... files){
+  default OutputBuilder withClasspath(File... files) {
     return withClasspath(Arrays.asList(files));
   }
 

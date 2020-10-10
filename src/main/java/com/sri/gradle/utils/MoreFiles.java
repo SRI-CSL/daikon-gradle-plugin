@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class MoreFiles {
-  private MoreFiles(){}
+  private MoreFiles() {}
 
-  public static List<String> getFullyQualifiedNames(List<File> javaFiles){
+  public static List<String> getFullyQualifiedNames(List<File> javaFiles) {
     return ImmutableStream.listCopyOf(
         javaFiles.stream()
             .map(MoreFiles::getFullyQualifiedName)
@@ -17,18 +17,18 @@ public class MoreFiles {
     );
   }
 
-  public static String getFullyQualifiedName(File fromFile){
+  public static String getFullyQualifiedName(File fromFile) {
     if (fromFile == null) throw new IllegalArgumentException("File is null");
 
     try {
       final String canonicalPath = fromFile.getCanonicalPath();
       return getFullyQualifiedName(canonicalPath);
-    } catch (IOException ignored){}
+    } catch (IOException ignored) {}
 
     return null;
   }
 
-  public static String getFullyQualifiedName(String canonicalPath){
+  public static String getFullyQualifiedName(String canonicalPath) {
     String deletingPrefix = canonicalPath.substring(
         0, canonicalPath.indexOf(Constants.PROJECT_TEST_CLASS_DIR));
     deletingPrefix = (deletingPrefix  + Constants.PROJECT_TEST_CLASS_DIR) + Constants.FILE_SEPARATOR;

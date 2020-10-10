@@ -17,58 +17,60 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
 
   private final List<URL> classpathUrls;
 
-  public TaskBuilderImpl(Path testClassesDir, TaskExecutorImpl executor){
+  public TaskBuilderImpl(Path testClassesDir, TaskExecutorImpl executor) {
     this.executor = executor;
     this.testClassesDir = testClassesDir;
     this.outputDir = null;
     this.classpathUrls = new LinkedList<>();
   }
 
-  public Path getTestClassesDir(){
+  public Path getTestClassesDir() {
     return testClassesDir;
   }
 
-  public Path getOutputDir(){
+  public Path getOutputDir() {
     return outputDir;
   }
 
-  public List<URL> getClasspath(){
+  public List<URL> getClasspath() {
     return classpathUrls;
   }
 
-  @Override public void toDir(File outputDir) {
+  @Override
+  public void toDir(File outputDir) {
 
     if (getTestClassesDir() == null) {
       executor.addError(new NullPointerException("input directory is null"));
       return;
     }
 
-    if (!Files.exists(getTestClassesDir())){
+    if (!Files.exists(getTestClassesDir())) {
       executor.addError(new Error("input directory " + getTestClassesDir() + " does not exist"));
       return;
     }
 
-    if (outputDir == null){
+    if (outputDir == null) {
       executor.addError(new NullPointerException("output directory is null"));
       return;
     }
 
-    if (!Files.exists(outputDir.toPath())){
+    if (!Files.exists(outputDir.toPath())) {
       executor.addError(new Error("output directory " + outputDir + " does exist"));
       return;
     }
 
-    if (this.outputDir == null){
+    if (this.outputDir == null) {
       this.outputDir = outputDir.toPath();
     }
 
-    if (getClasspath().isEmpty()){
+    if (getClasspath().isEmpty()) {
       executor.addError(new IllegalArgumentException("classpath is empty"));
     }
   }
 
-  @Override public OutputBuilder withClasspath(List<File> files) {
-    for (File each : files){
+  @Override
+  public OutputBuilder withClasspath(List<File> files) {
+    for (File each : files) {
       if (each == null) continue;
       classpathUrls.add(Urls.toURL(each.getAbsolutePath()));
     }
