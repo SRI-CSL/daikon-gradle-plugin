@@ -35,23 +35,23 @@ public class Command {
    * @param builder the command builder.
    */
   private Command(Builder builder) {
-    final Builder nonNullBuilder = Objects.requireNonNull(builder);
+    Objects.requireNonNull(builder);
 
-    this.stdout = nonNullBuilder.stdout;
-    this.stderr = nonNullBuilder.stderr;
-    this.args = new ArrayList<>(nonNullBuilder.args);
-    this.environment = nonNullBuilder.env;
+    this.stdout = builder.stdout;
+    this.stderr = builder.stderr;
+    this.args = new ArrayList<>(builder.args);
+    this.environment = builder.env;
 
-    this.workingDirectory = nonNullBuilder.workingDirectory;
-    this.permitNonZeroExitStatus = nonNullBuilder.permitNonZeroExitStatus;
+    this.workingDirectory = builder.workingDirectory;
+    this.permitNonZeroExitStatus = builder.permitNonZeroExitStatus;
 
     // checks if we maxed out the number of budgeted arguments
-    if (nonNullBuilder.maxCommandLength != -1) {
+    if (builder.maxCommandLength != -1) {
       final String string = toString();
-      if (string.length() > nonNullBuilder.maxCommandLength) {
+      if (string.length() > builder.maxCommandLength) {
         throw new IllegalStateException(
             "Maximum command length " +
-                nonNullBuilder.maxCommandLength + " exceeded by: " + string);
+                builder.maxCommandLength + " exceeded by: " + string);
       }
     }
   }

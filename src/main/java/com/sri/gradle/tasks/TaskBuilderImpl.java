@@ -38,13 +38,23 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
 
   @Override public void toDir(File outputDir) {
 
-    if (getTestClassesDir() == null || !Files.exists(getTestClassesDir())){
-      executor.addError(new NullPointerException("input directory is null or does not exist"));
+    if (getTestClassesDir() == null) {
+      executor.addError(new NullPointerException("input directory is null"));
       return;
     }
 
-    if (outputDir == null || !Files.exists(outputDir.toPath())){
-      executor.addError(new NullPointerException("output directory is null or does exist"));
+    if (!Files.exists(getTestClassesDir())){
+      executor.addError(new Error("input directory " + getTestClassesDir() + " does not exist"));
+      return;
+    }
+
+    if (outputDir == null){
+      executor.addError(new NullPointerException("output directory is null"));
+      return;
+    }
+
+    if (!Files.exists(outputDir.toPath())){
+      executor.addError(new Error("output directory " + outputDir + " does exist"));
       return;
     }
 

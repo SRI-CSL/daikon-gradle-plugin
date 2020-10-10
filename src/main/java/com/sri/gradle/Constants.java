@@ -37,5 +37,7 @@ public class Constants {
       + NEW_LINE + "this task would be located in the Daikon output directory "
       + NEW_LINE + "specified in your project's build.gradle";
 
-  private Constants(){}
+  private Constants() {
+    throw new Error("Do not instantiate");
+  }
 }

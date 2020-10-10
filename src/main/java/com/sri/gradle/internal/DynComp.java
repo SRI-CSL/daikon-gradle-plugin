@@ -31,15 +31,15 @@ public class DynComp extends AbstractTool {
     return (DynComp) super.setWorkingDirectory(directory);
   }
 
-  @Override public DynComp setToolJar(File toolJar){
-    return (DynComp) super.setToolJar(toolJar);
+  @Override public DynComp addToolJarToClasspath(File toolJar){
+    return (DynComp) super.addToolJarToClasspath(toolJar);
   }
 
   @Override public DynComp setClasspath(List<URL> classpathUrls) {
     return (DynComp) super.setClasspath(classpathUrls);
   }
 
-  public DynComp selectedClasses(List<String> fullyQualifiedClassNames) {
+  public DynComp setSelectedClasses(List<String> fullyQualifiedClassNames) {
     return (DynComp) setSelectPatterns(fullyQualifiedClassNames);
   }
 

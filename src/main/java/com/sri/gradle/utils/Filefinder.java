@@ -126,11 +126,9 @@ public class Filefinder {
 
   }
 
-  private static boolean isExcluded(String name, Set<String> excludedSet){
-    if(excludedSet.isEmpty()) return false; // base case
-
-    for(String each : excludedSet){
-      if(name.contains(each)) return true;
+  private static boolean isExcluded(String name, Set<String> excludedSet) {
+    for (String each : excludedSet) {
+      if (name.contains(each)) return true;
     }
 
     return false;

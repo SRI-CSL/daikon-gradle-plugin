@@ -89,7 +89,7 @@ public interface Tool {
     return setSelectPatterns(fullyQualifiedClassNames);
   }
 
-  Tool setToolJar(File toolJar);
+  Tool addToolJarToClasspath(File toolJar);
 
   Tool setWorkingDirectory(Path directory);
 }

@@ -61,8 +61,8 @@ public class TaskExecutorImpl implements TaskExecutor {
         .filter(f -> f.endsWith(Constants.TEST_DRIVER))
         .findFirst().orElse(null);
 
-    if(mainClass == null){
-      System.out.println("Not main class for DynComp operation");
+    if (mainClass == null) {
+      System.out.println("No main class for DynComp operation");
       return;
     }
 
@@ -105,7 +105,7 @@ public class TaskExecutorImpl implements TaskExecutor {
         .setClasspath(classpath)
         .setWorkingDirectory(outputDir)
         .setMainClass(mainClass)
-        .selectedClasses(allQualifiedClasses)
+        .setSelectedClasses(allQualifiedClasses)
         .setOutputDirectory(outputDir);
 
     dynComp.execute();
