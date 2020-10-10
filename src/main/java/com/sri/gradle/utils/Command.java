@@ -1,5 +1,6 @@
 package com.sri.gradle.utils;
 
+import com.google.common.base.MoreObjects;
 import com.google.common.collect.ImmutableList;
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,7 +16,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 public class Command {
 
@@ -58,16 +58,22 @@ public class Command {
 
   /**
    * Creates a Command.Builder object
+   * @return self to facilitate method chaining
    */
   public static Builder create() {
-    return create(System.out, System.err);
+    return create(null, null);
   }
 
   /**
-   * Creates a Command.Builder object
+   * Creates a Command.Builder object given standard output streams.
+   *
+   * @param stdout standard output
+   * @param stderr standard error output
+   *
+   * @return self to facilitate method chaining
    */
   public static Builder create(PrintStream stdout, PrintStream stderr) {
-    return new Builder(stdout, stderr);
+    return new Builder().standardStreams(stdout, stderr);
   }
 
   /**
@@ -80,7 +86,7 @@ public class Command {
       throw new IllegalStateException("Already started!");
     }
 
-    stdout.println("executing " + this);
+    println(stdout, ("executing " + this));
 
     final ProcessBuilder processBuilder = new ProcessBuilder().command(args)
         .redirectErrorStream(true);
@@ -91,7 +97,7 @@ public class Command {
 
     processBuilder.environment().putAll(environment);
 
-    stdout.println("INFO: " + String.format("Current process: %s", toString()));
+    println(stdout, ("INFO: " + String.format("Current process: %s", toString())));
 
     process = processBuilder.start();
   }
@@ -115,7 +121,8 @@ public class Command {
   }
 
   /**
-   * Returns the output returned by process.
+   * Reads from standard input and writes to standard output.
+   * Once the process completes, the command's output is returned.
    *
    * @return the output on terminal.
    * @throws IOException          unexpected behavior occurred.
@@ -132,9 +139,7 @@ public class Command {
 
       String outputLine;
       while ((outputLine = bufferedReader.readLine()) != null) {
-        if (stdout != null) {
-          stdout.println(outputLine);
-        }
+        println(stdout, outputLine);
 
         outputLines.add(outputLine);
       }
@@ -158,20 +163,33 @@ public class Command {
       start();
       return gatherOutput();
     } catch (IOException e) {
-      stderr.println(e.getMessage());
+      println(stderr, e.getMessage());
       throw new RuntimeException("Failed to execute process: " + args, e);
     } catch (InterruptedException e) {
-      stderr.println(e.getMessage());
+      println(stderr, e.getMessage());
       throw new RuntimeException("Interrupted while executing process: " + args, e);
     }
   }
 
   @Override public String toString() {
-    final String entrySetAsString = environment.entrySet().stream().map(Object::toString)
-        .collect(Collectors.joining(" "));
-    String envString = !environment.isEmpty() ? (entrySetAsString + " ") : "";
-    return envString + String.join(" ", args);
 
+    MoreObjects.ToStringHelper toString =  MoreObjects.toStringHelper(this);
+    for (String eachKey : environment.keySet()){
+      toString = toString.add(eachKey, environment.get(eachKey));
+    }
+
+    for (String eachArg : args){
+      toString = toString.addValue(eachArg);
+    }
+
+    return toString.toString();
+
+  }
+
+  private static void println(PrintStream pstream, String text){
+    if (pstream != null){
+      pstream.println(text);
+    }
   }
 
   /**
@@ -179,8 +197,8 @@ public class Command {
    */
   public static class Builder {
 
-    private final PrintStream stdout;
-    private final PrintStream stderr;
+    private PrintStream stdout;
+    private PrintStream stderr;
     private final List<String> args;
     private final Map<String, String> env;
 
@@ -191,9 +209,9 @@ public class Command {
     /**
      * Creates a command builder.
      */
-    Builder(PrintStream stdout, PrintStream stderr) {
-      this.stdout = Objects.requireNonNull(stdout);
-      this.stderr = Objects.requireNonNull(stderr);
+    Builder() {
+      this.stdout = null;
+      this.stderr = null;
 
       this.workingDirectory = null;
       this.permitNonZeroExitStatus = false;
@@ -238,6 +256,20 @@ public class Command {
      */
     public Builder environment(String key, String value) {
       env.put(Objects.requireNonNull(key), Objects.requireNonNull(value));
+      return this;
+    }
+
+    /**
+     * Sets the standard streams (out and error) to which the Command
+     * writes its output and its error output.
+     *
+     * @param stdout the standard output
+     * @param stderr the standard error
+     * @return self
+     */
+    public Builder standardStreams(PrintStream stdout, PrintStream stderr){
+      this.stdout = stdout;
+      this.stderr = stderr;
       return this;
     }
 
@@ -339,7 +371,9 @@ public class Command {
       }
 
       for (String outputLine : outputLines) {
-        result.append("\n  ").append(outputLine);
+        result.append(System.lineSeparator())
+            .append("  ")
+            .append(outputLine);
       }
 
       return result.toString();

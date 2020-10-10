@@ -11,14 +11,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public abstract class AbstractTool {
-  protected static final String BAD_DAIKON_ERROR = "Unable to run Daikon. Are you sure daikon.jar is in your path?";
+public abstract class AbstractTool implements Tool {
+
   private final Command.Builder builder;
 
   private final List<URL> classpathUrls;
   private Object[] args = new Object[0];
 
-  public AbstractTool(){
+  public AbstractTool() {
     this.builder = Command.create()
         .arguments("java")
         .arguments("-Xmx4G")
@@ -31,69 +31,32 @@ public abstract class AbstractTool {
     return args;
   }
 
-  protected void args(Object... args) {
+  @Override public void args(Object... args) {
     this.args = Stream.concat(
         stream(this.args), stream(args)).toArray(Object[]::new);
   }
 
-  public AbstractTool setToolJar(File toolJar){
+  @Override public Tool setToolJar(File toolJar) {
     getClasspath().add(Urls.toURL(toolJar.getAbsolutePath()));
     return this;
   }
 
-  public AbstractTool setClasspath(List<URL> classpathUrls){
+  @Override public Tool setClasspath(List<URL> classpathUrls) {
     this.classpathUrls.clear();
     this.classpathUrls.addAll(classpathUrls);
     return this;
   }
 
-  public List<URL> getClasspath(){
+  public List<URL> getClasspath() {
     return classpathUrls;
   }
 
-  public abstract List<String> execute() throws ToolException;
-
-  public Command.Builder getBuilder(){
+  public Command.Builder getBuilder() {
     return builder;
   }
 
-  public AbstractTool selectPatterns(List<String> fullyQualifiedClassNamePatterns){
-    //noinspection Convert2streamapi
-    for(String qualifiedName : fullyQualifiedClassNamePatterns){ // unchecked warning
-      selectPattern(qualifiedName);
-    }
-
-    return this;
-  }
-
-  public AbstractTool selectPattern(String classnamePattern){
-    args("--ppt-select-pattern=" + classnamePattern);
-    return this;
-  }
-
-  public AbstractTool help(){
-    args("--help");
-    return this;
-  }
-
-  public AbstractTool setWorkingDirectory(Path directory) {
+  @Override public Tool setWorkingDirectory(Path directory) {
     builder.workingDirectory(directory.toFile());
     return this;
   }
-
-  public AbstractTool omitPatterns(List<String> fullyQualifiedClassNamePatterns){
-    //noinspection Convert2streamapi
-    for(String qualifiedName : fullyQualifiedClassNamePatterns){ // unchecked warning
-      omitPattern(qualifiedName);
-    }
-
-    return this;
-  }
-
-  public AbstractTool omitPattern(String classnamePattern){
-    args("--ppt-omit-pattern=" + classnamePattern);
-    return this;
-  }
-
-
 }
