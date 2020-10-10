@@ -4,7 +4,7 @@ import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 public class FooStuffTestDriver {
-  public static void main(String... args){
+  public static void main(String... args) {
     final FooStuffTestDriver a = new FooStuffTestDriver();
     a.testEquality();
   }
