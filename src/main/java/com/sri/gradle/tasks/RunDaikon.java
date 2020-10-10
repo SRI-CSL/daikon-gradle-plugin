@@ -46,12 +46,14 @@ public class RunDaikon extends AbstractNamedTask {
     final String testpath = getTestDriverPackage().get().replaceAll("\\.", Constants.FILE_SEPARATOR);
     final File inputDir = buildTestDir.dir(testpath).getAsFile();
 
+    // jar files under the directory specified in the build.gradle's `requires` statement
     final File dependenciesDir = getRequires()
         .getAsFile()
         .get();
 
     final List<File> classpath = new LinkedList<>(
         Filefinder.findJavaJars(dependenciesDir.toPath()));
+
     classpath.add(buildMainDir.getAsFile());
     classpath.add(buildTestDir.getAsFile());
 

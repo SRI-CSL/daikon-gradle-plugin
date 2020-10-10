@@ -21,6 +21,7 @@ public class Constants {
   public static final String PROJECT_LIB_DIR = "libs";
   public static final String PROJECT_MAIN_CLASS_DIR = "classes/java/main";
   public static final String PROJECT_TEST_CLASS_DIR = "classes/java/test";
+  public static final String PROJECT_TEST_SRC_DIR = "src/test/java";
 
   public static final String NEW_LINE = System.getProperty("line.separator");
   public static final String FILE_SEPARATOR = System.getProperty("file.separator");

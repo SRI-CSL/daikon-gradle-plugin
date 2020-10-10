@@ -1,8 +1,8 @@
 package com.sri.gradle.internal;
 
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.List;
 
 public interface Program {
@@ -22,7 +22,7 @@ public interface Program {
     return this;
   }
 
-  Program setClasspath(List<URL> classpathUrls);
+  Program setClasspath(Collection<File> aClasspath);
 
   default Program setComparabilityFile(Path directory, String filename) {
     final Path resolved = directory.resolve(filename);
@@ -79,7 +79,7 @@ public interface Program {
   }
 
   default Program setStandardOutput(String filename) {
-    args(String.format("-o %s", filename));
+    args(String.format("%s %s", "-o", filename));
 
     return this;
   }

@@ -1,6 +1,7 @@
 package com.sri.gradle.tasks;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ImmutableSet;
 import com.sri.gradle.Constants;
 import com.sri.gradle.internal.Chicory;
 import com.sri.gradle.internal.Daikon;
@@ -10,10 +11,11 @@ import com.sri.gradle.internal.Program;
 import com.sri.gradle.utils.Filefinder;
 import com.sri.gradle.utils.MoreFiles;
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import org.gradle.api.Project;
 
 public class TaskExecutorImpl implements TaskExecutor {
@@ -58,7 +60,9 @@ public class TaskExecutorImpl implements TaskExecutor {
   private static void applyBuiltConfiguration(TaskBuilderImpl each) {
     final Path classesDir = each.getTestClassesDir().toPath();
     final Path outputDir = each.getOutputDir();
-    final List<URL> classpath = each.getClasspath();
+    // collects all files and directories that need to be in our classpath
+    // e.g., files in `requires` directory and the plugin's runtime classpath
+    final Set<File> classpath = ImmutableSet.copyOf(each.getClasspath());
 
     final List<File>    allTestClasses  = Filefinder.findJavaClasses(classesDir, "$"/*exclude those that contain this symbol*/);
     final List<String>  allQualifiedClasses = MoreFiles.getFullyQualifiedNames(allTestClasses);
@@ -71,7 +75,12 @@ public class TaskExecutorImpl implements TaskExecutor {
         .findFirst().orElse(null);
 
     if (each.getTestDriverPackage() != null) {
-      final GenerateTestDriver generateTestDriver = new GenerateTestDriver(each.getGradleProject(), each.getTestDriverPackage(), allQualifiedClasses);
+      final GenerateTestDriver generateTestDriver = new GenerateTestDriver(
+          each.getGradleProject(),
+          each.getTestDriverPackage(),
+          allQualifiedClasses
+      );
+
       if (!generateTestDriver.writeTo(outputDir.toFile())){
         println(each.getGradleProject(), "Unable to generate or compile the new TestDriver class");
         return;
@@ -90,40 +99,42 @@ public class TaskExecutorImpl implements TaskExecutor {
 
     final String prefix = mainClass.substring(mainClass.lastIndexOf('.') + 1);
 
-    executeDynComp(mainClass, allQualifiedClasses, classpath, outputDir);
-    executeChicory(mainClass, prefix, allQualifiedClasses, classpath, outputDir);
-    executeDaikon(mainClass, prefix, classpath, outputDir);
+    executeDynComp(mainClass, allQualifiedClasses, classpath, classesDir, outputDir);
+    executeChicory(mainClass, prefix, allQualifiedClasses, classpath, classesDir, outputDir);
+    executeDaikon(mainClass, prefix, classpath, classesDir, outputDir);
   }
 
-  private static void executeDaikon(String mainClass, String namePrefix, List<URL> classpath, Path outputDir) {
+  private static void executeDaikon(String mainClass, String namePrefix, Collection<File> classpath,
+      Path testClassDir, Path outputDir) {
     final Program daikon = new Daikon()
         .setClasspath(classpath)
-        .setWorkingDirectory(outputDir)
+        .setWorkingDirectory(testClassDir)
         .setMainClass(mainClass)
         .setDtraceFile(outputDir, namePrefix + ".dtrace.gz")
-        .setStandardOutput(namePrefix + ".inv.gz");
+        .setStandardOutput(outputDir.resolve(namePrefix + ".inv.gz").toFile().getAbsolutePath());
 
     daikon.execute();
   }
 
   private static void executeChicory(String mainClass, String namePrefix, List<String> allQualifiedClasses,
-      List<URL> classpath, Path outputDir) {
+      Collection<File> classpath, Path testClassDir, Path outputDir) {
     final Program chicory = new Chicory()
         .setClasspath(classpath)
         .setWorkingDirectory(outputDir)
         .setMainClass(mainClass)
         .setSelectedClasses(allQualifiedClasses)
-        .setOutputDirectory(outputDir)
+        // TODO(has) seems that workingDirectory is affecting the output setting behavior.
+//        .setOutputDirectory(outputDir)
         .setComparabilityFile(outputDir, namePrefix + ".decls-DynComp");
 
     chicory.execute();
   }
 
   private static void executeDynComp(String mainClass, List<String> allQualifiedClasses,
-      List<URL> classpath, Path outputDir) {
+      Collection<File> classpath, Path testClassDir, Path outputDir) {
     final Program dynComp = new DynComp()
         .setClasspath(classpath)
-        .setWorkingDirectory(outputDir)
+        .setWorkingDirectory(testClassDir)
         .setMainClass(mainClass)
         .setSelectedClasses(allQualifiedClasses)
         .setOutputDirectory(outputDir);

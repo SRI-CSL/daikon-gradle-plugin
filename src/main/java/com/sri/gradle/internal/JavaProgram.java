@@ -3,10 +3,9 @@ package com.sri.gradle.internal;
 import static java.util.Arrays.stream;
 
 import com.sri.gradle.utils.Command;
-import com.sri.gradle.utils.Urls;
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Path;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
@@ -15,7 +14,7 @@ public abstract class JavaProgram implements Program {
 
   private final Command.Builder builder;
 
-  private final List<URL> classpathUrls;
+  private final List<File> classpath;
   private Object[] args = new Object[0];
 
   public JavaProgram() {
@@ -24,7 +23,7 @@ public abstract class JavaProgram implements Program {
         .arguments("-Xmx4G")
         .permitNonZeroExitStatus();
 
-    this.classpathUrls = new LinkedList<>();
+    this.classpath = new LinkedList<>();
   }
 
   public Object[] getArgs() {
@@ -37,18 +36,18 @@ public abstract class JavaProgram implements Program {
   }
 
   @Override public Program setToolJar(File toolJar) {
-    getClasspath().add(Urls.toURL(toolJar.getAbsolutePath()));
+    getClasspath().add(toolJar);
     return this;
   }
 
-  @Override public Program setClasspath(List<URL> classpathUrls) {
-    this.classpathUrls.clear();
-    this.classpathUrls.addAll(classpathUrls);
+  @Override public Program setClasspath(Collection<File> aClasspath) {
+    this.classpath.clear();
+    this.classpath.addAll(aClasspath);
     return this;
   }
 
-  public List<URL> getClasspath() {
-    return classpathUrls;
+  public List<File> getClasspath() {
+    return classpath;
   }
 
   public Command.Builder getBuilder() {

@@ -29,6 +29,17 @@ public class ImmutableStream {
   }
 
   /**
+   * Concatenation of two sets using their Stream API.
+   * @param x first set
+   * @param y second set
+   * @param <T> type of element in a set
+   * @return added values of two sets into a single stream.
+   */
+  public static <T> Stream<T> concat(Stream<? extends T> x, Stream<? extends T> y){
+    return Stream.concat(x, y);
+  }
+
+  /**
    * Converts stream of object into an immutable set.
    *
    * @param stream stream of objects
