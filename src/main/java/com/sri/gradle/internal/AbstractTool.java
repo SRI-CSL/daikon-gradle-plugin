@@ -31,17 +31,20 @@ public abstract class AbstractTool implements Tool {
     return args;
   }
 
-  @Override public void args(Object... args) {
+  @Override
+  public void args(Object... args) {
     this.args = Stream.concat(
         stream(this.args), stream(args)).toArray(Object[]::new);
   }
 
-  @Override public Tool setToolJar(File toolJar) {
+  @Override
+  public Tool setToolJar(File toolJar) {
     getClasspath().add(Urls.toURL(toolJar.getAbsolutePath()));
     return this;
   }
 
-  @Override public Tool setClasspath(List<URL> classpathUrls) {
+  @Override
+  public Tool setClasspath(List<URL> classpathUrls) {
     this.classpathUrls.clear();
     this.classpathUrls.addAll(classpathUrls);
     return this;
@@ -55,7 +58,8 @@ public abstract class AbstractTool implements Tool {
     return builder;
   }
 
-  @Override public Tool setWorkingDirectory(Path directory) {
+  @Override
+  public Tool setWorkingDirectory(Path directory) {
     builder.workingDirectory(directory.toFile());
     return this;
   }

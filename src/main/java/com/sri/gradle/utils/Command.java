@@ -171,14 +171,15 @@ public class Command {
     }
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
 
     MoreObjects.ToStringHelper toString =  MoreObjects.toStringHelper(this);
-    for (String eachKey : environment.keySet()){
+    for (String eachKey : environment.keySet()) {
       toString = toString.add(eachKey, environment.get(eachKey));
     }
 
-    for (String eachArg : args){
+    for (String eachArg : args) {
       toString = toString.addValue(eachArg);
     }
 
@@ -186,8 +187,8 @@ public class Command {
 
   }
 
-  private static void println(PrintStream pstream, String text){
-    if (pstream != null){
+  private static void println(PrintStream pstream, String text) {
+    if (pstream != null) {
       pstream.println(text);
     }
   }
@@ -267,7 +268,7 @@ public class Command {
      * @param stderr the standard error
      * @return self
      */
-    public Builder standardStreams(PrintStream stdout, PrintStream stderr){
+    public Builder standardStreams(PrintStream stdout, PrintStream stderr) {
       this.stdout = stdout;
       this.stderr = stderr;
       return this;
@@ -322,7 +323,8 @@ public class Command {
     }
 
 
-    @Override public String toString() {
+    @Override
+    public String toString() {
       final String left = this.args.toString();
       String right = Optional.ofNullable(workingDirectory)
           .map(File::toString)

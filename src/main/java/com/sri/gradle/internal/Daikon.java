@@ -14,7 +14,8 @@ public class Daikon extends AbstractTool {
     super();
   }
 
-  @Override public void execute() throws ToolException {
+  @Override
+  public void execute() throws ToolException {
     try {
       final String classPath = getClasspath().stream()
           .map(URL::toString)
@@ -32,7 +33,7 @@ public class Daikon extends AbstractTool {
 
       if (!err.isEmpty()) throw new ToolException(Constants.BAD_DAIKON_ERROR);
 
-    } catch (Exception e){
+    } catch (Exception e) {
       throw new ToolException(Constants.BAD_DAIKON_ERROR, e);
     }
   }

@@ -17,48 +17,50 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
 
   private final List<URL> classpathUrls;
 
-  public TaskBuilderImpl(Path testClassesDir, TaskExecutorImpl executor){
+  public TaskBuilderImpl(Path testClassesDir, TaskExecutorImpl executor) {
     this.executor = executor;
     this.testClassesDir = testClassesDir;
     this.outputDir = null;
     this.classpathUrls = new LinkedList<>();
   }
 
-  public Path getTestClassesDir(){
+  public Path getTestClassesDir() {
     return testClassesDir;
   }
 
-  public Path getOutputDir(){
+  public Path getOutputDir() {
     return outputDir;
   }
 
-  public List<URL> getClasspath(){
+  public List<URL> getClasspath() {
     return classpathUrls;
   }
 
-  @Override public void toDir(File outputDir) {
+  @Override
+  public void toDir(File outputDir) {
 
-    if (getTestClassesDir() == null || !Files.exists(getTestClassesDir())){
+    if (getTestClassesDir() == null || !Files.exists(getTestClassesDir())) {
       executor.addError(new NullPointerException("input directory is null or does not exist"));
       return;
     }
 
-    if (outputDir == null || !Files.exists(outputDir.toPath())){
+    if (outputDir == null || !Files.exists(outputDir.toPath())) {
       executor.addError(new NullPointerException("output directory is null or does exist"));
       return;
     }
 
-    if (this.outputDir == null){
+    if (this.outputDir == null) {
       this.outputDir = outputDir.toPath();
     }
 
-    if (getClasspath().isEmpty()){
+    if (getClasspath().isEmpty()) {
       executor.addError(new IllegalArgumentException("classpath is empty"));
     }
   }
 
-  @Override public OutputBuilder withClasspath(List<File> files) {
-    for (File each : files){
+  @Override
+  public OutputBuilder withClasspath(List<File> files) {
+    for (File each : files) {
       if (each == null) continue;
       classpathUrls.add(Urls.toURL(each.getAbsolutePath()));
     }

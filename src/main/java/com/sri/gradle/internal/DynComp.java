@@ -10,7 +10,7 @@ import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class DynComp extends AbstractTool {
-  public DynComp(){
+  public DynComp() {
     super();
   }
 
@@ -19,23 +19,26 @@ public class DynComp extends AbstractTool {
     return this;
   }
 
-  public DynComp setMainClass(String name){
-    if(name == null || name.isEmpty())
+  public DynComp setMainClass(String name) {
+    if (name == null || name.isEmpty())
       return this;
 
     args(name);
     return this;
   }
 
-  @Override public DynComp setWorkingDirectory(Path directory) {
+  @Override
+  public DynComp setWorkingDirectory(Path directory) {
     return (DynComp) super.setWorkingDirectory(directory);
   }
 
-  @Override public DynComp setToolJar(File toolJar){
+  @Override
+  public DynComp setToolJar(File toolJar) {
     return (DynComp) super.setToolJar(toolJar);
   }
 
-  @Override public DynComp setClasspath(List<URL> classpathUrls) {
+  @Override
+  public DynComp setClasspath(List<URL> classpathUrls) {
     return (DynComp) super.setClasspath(classpathUrls);
   }
 
@@ -47,7 +50,8 @@ public class DynComp extends AbstractTool {
     return (DynComp) setOmitPatterns(fullyQualifiedClassNames);
   }
 
-  @Override public void execute() throws ToolException {
+  @Override
+  public void execute() throws ToolException {
     try {
       final String classPath = getClasspath().stream()
           .map(URL::toString)
@@ -64,7 +68,7 @@ public class DynComp extends AbstractTool {
           .filter(s -> s.startsWith(Constants.ERROR_MARKER)));
 
       if (!err.isEmpty()) throw new ToolException(Constants.BAD_DAIKON_ERROR);
-    } catch (Exception e){
+    } catch (Exception e) {
       throw new ToolException(Constants.BAD_DAIKON_ERROR, e);
     }
   }

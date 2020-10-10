@@ -119,7 +119,8 @@ public class RunDaikon extends AbstractNamedTask {
 
     TaskExecutor executor;
 
-    @Override public final synchronized void configure(TaskExecutor executor) {
+    @Override
+    public final synchronized void configure(TaskExecutor executor) {
       try {
         if (this.executor != null) {
           throw new IllegalStateException("executor already available");
