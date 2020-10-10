@@ -81,7 +81,7 @@ public class RunDaikon extends AbstractNamedTask {
 
     getLogger().debug("About to execute task");
     executor.execute();
-    getLogger().debug("Successfully executed task");
+    getLogger().quiet(Constants.SUCCESSFUL_EXECUTION);
   }
 
   @OutputDirectory public DirectoryProperty getOutputDir() {
@@ -116,7 +116,8 @@ public class RunDaikon extends AbstractNamedTask {
     private final List<File> classpath;
     private final File outputDir;
 
-    RunDaikonConfiguration(File inputDir, String testDriverPackage, Project project, List<File> classpath, File outputDir) {
+    RunDaikonConfiguration(File inputDir, String testDriverPackage,
+      Project project, List<File> classpath, File outputDir) {
       this.inputDir = inputDir;
       this.testDriverPackage = testDriverPackage;
       this.project = project;
@@ -137,7 +138,8 @@ public class RunDaikon extends AbstractNamedTask {
 
     TaskExecutor executor;
 
-    @Override public final synchronized void configure(TaskExecutor executor) {
+    @Override
+    public final synchronized void configure(TaskExecutor executor) {
       try {
         if (this.executor != null) {
           throw new IllegalStateException("executor already available");

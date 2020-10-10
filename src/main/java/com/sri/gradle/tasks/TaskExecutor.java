@@ -6,11 +6,10 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Formatter;
 import java.util.List;
-import javax.inject.Provider;
 import org.gradle.api.Project;
 
 /**
- * Wraps DyComp, Chicory, and Daikon into a single task:
+ * Wraps DynComp, Chicory, and Daikon into a single task:
  *
  * runDaikonOn(new InputProvider(inputDirectory, testDriverPackage (optional), GradleProject))
  *  .withClasspath(file1, file2, ...) or .withClasspath(Collection(File))
@@ -28,7 +27,7 @@ public interface TaskExecutor {
    *
    * @param configuration install configuration into task executor.
    */
-  default void install(TaskConfiguration configuration){
+  default void install(TaskConfiguration configuration) {
     configuration.configure(this);
   }
 
@@ -47,13 +46,13 @@ public interface TaskExecutor {
   void execute() throws TaskConfigurationError;
 
   class TaskConfigurationError extends RuntimeException {
-    TaskConfigurationError(Collection<Throwable> throwables){
+    TaskConfigurationError(Collection<Throwable> throwables) {
       super(buildErrorMessage(throwables));
     }
 
     private static String buildErrorMessage(Collection<Throwable> errorMessages) {
       final List<Throwable> encounteredErrors = new ArrayList<>(errorMessages);
-      if(!encounteredErrors.isEmpty()){
+      if (!encounteredErrors.isEmpty()) {
         encounteredErrors.sort(new ThrowableComparator());
       }
 
@@ -73,7 +72,8 @@ public interface TaskExecutor {
 
 
   class ThrowableComparator implements Comparator<Throwable> {
-    @Override public int compare(Throwable a, Throwable b) {
+    @Override
+    public int compare(Throwable a, Throwable b) {
       return a.getMessage().compareTo(b.getMessage());
     }
   }

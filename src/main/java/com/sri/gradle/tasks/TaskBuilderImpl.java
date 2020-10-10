@@ -56,7 +56,7 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
     return gradleProject;
   }
 
-  public Path getOutputDir(){
+  public Path getOutputDir() {
     return outputDir;
   }
 
@@ -68,29 +68,41 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
     return testDriverPackage;
   }
 
-  @Override public void toDir(File outputDir) {
+  @Override
+  public void toDir(File outputDir) {
 
-    if (getTestClassesDir() == null || !Files.exists(getTestClassesDir().toPath())){
-      executor.addError(new NullPointerException("input directory is null or does not exist"));
+    if (getTestClassesDir() == null) {
+      executor.addError(new NullPointerException("input directory is null"));
       return;
     }
 
-    if (outputDir == null || !Files.exists(outputDir.toPath())){
-      executor.addError(new NullPointerException("output directory is null or does exist"));
+    if (!Files.exists(getTestClassesDir().toPath())) {
+      executor.addError(new Error("input directory " + getTestClassesDir() + " does not exist"));
       return;
     }
 
-    if (this.outputDir == null){
+    if (outputDir == null) {
+      executor.addError(new NullPointerException("output directory is null"));
+      return;
+    }
+
+    if (!Files.exists(outputDir.toPath())) {
+      executor.addError(new Error("output directory " + outputDir + " does not exist"));
+      return;
+    }
+
+    if (this.outputDir == null) {
       this.outputDir = outputDir.toPath();
     }
 
-    if (getClasspath().isEmpty()){
+    if (getClasspath().isEmpty()) {
       executor.addError(new IllegalArgumentException("classpath is empty"));
     }
   }
 
-  @Override public OutputBuilder withClasspath(List<File> files) {
-    for (File each : files){
+  @Override
+  public OutputBuilder withClasspath(List<File> files) {
+    for (File each : files) {
       if (each == null) continue;
       classpathUrls.add(Urls.toURL(each.getAbsolutePath()));
     }

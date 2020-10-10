@@ -14,21 +14,21 @@ import java.util.List;
 import org.junit.Test;
 
 public class DaikonPluginTest {
-  @Test public void testJavafinder(){
+  @Test public void testJavafinder() {
     Path dir = new File("src/main/java/com/sri/gradle/utils").toPath();
     System.out.println(dir);
     List<File> filesAvailable = Filefinder.findJavaFiles(dir);
     assertThat(filesAvailable.size(), is(5));
   }
 
-  @Test public void testCommandBuilder(){
+  @Test public void testCommandBuilder() {
     List<String> filesAvailable = Command.create().arguments("ls")
         .permitNonZeroExitStatus().execute();
 
     assertThat(filesAvailable.size(), is(9));
   }
 
-  @Test public void testFQNExtractor(){
+  @Test public void testFQNExtractor() {
     final String canonicalPath = "daikon-gradle-plugin/consumer/build/classes/java/test/com/foo/FooStuffTestDriver.class";
     final String fqn = MoreFiles.getFullyQualifiedName(canonicalPath);
 

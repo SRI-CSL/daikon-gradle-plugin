@@ -7,11 +7,12 @@ import java.util.List;
 import java.util.Objects;
 
 public class DynComp extends JavaProgram {
-  public DynComp(){
+  public DynComp() {
     super();
   }
 
-  @Override public void execute() throws JavaProgramException {
+  @Override
+  public void execute() throws ToolException {
     try {
       final String classPath = Urls.toURLStr(getClasspath());
 
@@ -26,7 +27,7 @@ public class DynComp extends JavaProgram {
           .filter(s -> s.startsWith(Constants.ERROR_MARKER)));
 
       if (!err.isEmpty()) throw new JavaProgramException(Constants.BAD_DAIKON_ERROR);
-    } catch (Exception e){
+    } catch (Exception e) {
       throw new JavaProgramException(Constants.BAD_DAIKON_ERROR, e);
     }
   }

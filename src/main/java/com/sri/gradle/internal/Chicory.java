@@ -12,7 +12,8 @@ public class Chicory extends JavaProgram {
     super();
   }
 
-  @Override public void execute() throws JavaProgramException {
+  @Override
+  public void execute() throws JavaProgramException {
     try {
       final String classPath = Urls.toURLStr(getClasspath());
 
@@ -28,7 +29,7 @@ public class Chicory extends JavaProgram {
 
       if (!err.isEmpty()) throw new JavaProgramException(Constants.BAD_DAIKON_ERROR);
 
-    } catch (Exception e){
+    } catch (Exception e) {
       throw new JavaProgramException(Constants.BAD_DAIKON_ERROR, e);
     }
   }
