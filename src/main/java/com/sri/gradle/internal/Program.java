@@ -1,7 +1,6 @@
 package com.sri.gradle.internal;
 
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 
@@ -22,7 +21,7 @@ public interface Program {
     return this;
   }
 
-  Program setClasspath(List<URL> classpathUrls);
+  Program setClasspath(List<File> files);
 
   default Program setComparabilityFile(Path directory, String filename) {
     final Path resolved = directory.resolve(filename);

@@ -10,7 +10,6 @@ import com.sri.gradle.internal.Program;
 import com.sri.gradle.utils.Filefinder;
 import com.sri.gradle.utils.MoreFiles;
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -60,7 +59,7 @@ public class TaskExecutorImpl implements TaskExecutor {
   private static void applyBuiltConfiguration(TaskBuilderImpl each) {
     final Path classesDir = each.getTestClassesDir().toPath();
     final Path outputDir = each.getOutputDir();
-    final List<URL> classpath = each.getClasspath();
+    final List<File> classpath = each.getClasspath();
 
     final List<File>    allTestClasses  = Filefinder.findJavaClasses(classesDir, "$"/*exclude those that contain this symbol*/);
     final List<String>  allQualifiedClasses = MoreFiles.getFullyQualifiedNames(allTestClasses);
@@ -97,7 +96,7 @@ public class TaskExecutorImpl implements TaskExecutor {
     executeDaikon(mainClass, prefix, classpath, outputDir);
   }
 
-  private static void executeDaikon(String mainClass, String namePrefix, List<URL> classpath, Path outputDir) {
+  private static void executeDaikon(String mainClass, String namePrefix, List<File> classpath, Path outputDir) {
     final Program daikon = new Daikon()
         .setClasspath(classpath)
         .setWorkingDirectory(outputDir)
@@ -109,7 +108,7 @@ public class TaskExecutorImpl implements TaskExecutor {
   }
 
   private static void executeChicory(String mainClass, String namePrefix, List<String> allQualifiedClasses,
-      List<URL> classpath, Path outputDir) {
+      List<File> classpath, Path outputDir) {
     final Program chicory = new Chicory()
         .setClasspath(classpath)
         .setWorkingDirectory(outputDir)
@@ -122,7 +121,7 @@ public class TaskExecutorImpl implements TaskExecutor {
   }
 
   private static void executeDynComp(String mainClass, List<String> allQualifiedClasses,
-      List<URL> classpath, Path outputDir) {
+      List<File> classpath, Path outputDir) {
     final Program dynComp = new DynComp()
         .setClasspath(classpath)
         .setWorkingDirectory(outputDir)

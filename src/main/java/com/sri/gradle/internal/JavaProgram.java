@@ -3,9 +3,7 @@ package com.sri.gradle.internal;
 import static java.util.Arrays.stream;
 
 import com.sri.gradle.utils.Command;
-import com.sri.gradle.utils.Urls;
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -15,7 +13,7 @@ public abstract class JavaProgram implements Program {
 
   private final Command.Builder builder;
 
-  private final List<URL> classpathUrls = new LinkedList<>();
+  private final List<File> classpath = new LinkedList<>();
   private Object[] args = new Object[0];
 
   public JavaProgram() {
@@ -37,19 +35,19 @@ public abstract class JavaProgram implements Program {
 
   @Override
   public Program addToolJarToClasspath(File toolJar) {
-    getClasspath().add(Urls.toURL(toolJar.getAbsolutePath()));
+    getClasspath().add(toolJar);
     return this;
   }
 
   @Override
-  public Program setClasspath(List<URL> classpathUrls) {
-    this.classpathUrls.clear();
-    this.classpathUrls.addAll(classpathUrls);
+  public Program setClasspath(List<File> files) {
+    this.classpath.clear();
+    this.classpath.addAll(files);
     return this;
   }
 
-  public List<URL> getClasspath() {
-    return classpathUrls;
+  public List<File> getClasspath() {
+    return classpath;
   }
 
   public Command.Builder getBuilder() {

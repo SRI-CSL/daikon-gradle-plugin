@@ -22,10 +22,11 @@ public class DaikonPluginTest {
   }
 
   @Test public void testCommandBuilder() {
-    List<String> filesAvailable = Command.create().arguments("ls")
+    List<String> echoResult = Command.create().arguments("echo", "hello")
         .permitNonZeroExitStatus().execute();
 
-    assertThat(filesAvailable.size(), is(9));
+    assertThat(echoResult.size(), is(1));
+    assertEquals(echoResult.get(0), "hello");
   }
 
   @Test public void testFQNExtractor() {
