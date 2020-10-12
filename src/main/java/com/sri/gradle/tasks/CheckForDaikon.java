@@ -15,7 +15,7 @@ public class CheckForDaikon extends AbstractNamedTask {
       );
 
       new Daikon()
-          .setToolJar(daikonJar)
+          .addToolJarToClasspath(daikonJar)
           .help()
           .execute();
 

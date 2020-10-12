@@ -5,32 +5,32 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.List;
 
-public interface Tool {
+public interface Program {
 
   void args(Object... args);
 
   /**
    * Executes the tool given its previous configuration.
-   * @throws ToolException if Daikon is not found either in the project's classpath
+   * @throws JavaProgramException if Daikon is not found either in the project's classpath
    *  or in the path provided by the user in the project's build.gradle (i.e., requires(x)
    *  statement)
    */
-  void execute() throws ToolException;
+  void execute() throws JavaProgramException;
 
-  default Tool help() {
+  default Program help() {
     args("--help");
     return this;
   }
 
-  Tool setClasspath(List<URL> classpathUrls);
+  Program setClasspath(List<URL> classpathUrls);
 
-  default Tool setComparabilityFile(Path directory, String filename) {
+  default Program setComparabilityFile(Path directory, String filename) {
     final Path resolved = directory.resolve(filename);
     args(String.format("--comparability-file=%s", resolved));
     return this;
   }
 
-  default Tool setMainClass(String name) {
+  default Program setMainClass(String name) {
     if (name == null || name.isEmpty()) {
       return this;
     }
@@ -39,7 +39,7 @@ public interface Tool {
     return this;
   }
 
-  default Tool setOmitPatterns(List<String> fullyQualifiedClassNamePatterns) {
+  default Program setOmitPatterns(List<String> fullyQualifiedClassNamePatterns) {
     //noinspection Convert2streamapi
     for (String qualifiedName : fullyQualifiedClassNamePatterns) { // unchecked warning
       setOmitPattern(qualifiedName);
@@ -48,23 +48,23 @@ public interface Tool {
     return this;
   }
 
-  default Tool setOmitPattern(String classnamePattern) {
+  default Program setOmitPattern(String classnamePattern) {
     args("--ppt-omit-pattern=" + classnamePattern);
     return this;
   }
 
-  default Tool setOutputDirectory(Path directory) {
+  default Program setOutputDirectory(Path directory) {
     args(String.format("--output_dir=%s", directory));
     return this;
   }
 
-  default Tool setDtraceFile(Path directory, String filename) {
+  default Program setDtraceFile(Path directory, String filename) {
     final Path resolved = directory.resolve(filename);
     args(String.format("%s", resolved));
     return this;
   }
 
-  default Tool setSelectPatterns(List<String> fullyQualifiedClassNamePatterns) {
+  default Program setSelectPatterns(List<String> fullyQualifiedClassNamePatterns) {
     //noinspection Convert2streamapi
     for (String qualifiedName : fullyQualifiedClassNamePatterns) { // unchecked warning
       setSelectPattern(qualifiedName);
@@ -73,23 +73,23 @@ public interface Tool {
     return this;
   }
 
-  default Tool setSelectPattern(String classnamePattern) {
+  default Program setSelectPattern(String classnamePattern) {
     args("--ppt-select-pattern=" + classnamePattern);
     return this;
   }
 
-  default Tool setStandardOutput(String filename) {
+  default Program setStandardOutput(String filename) {
     args(String.format("-o %s", filename));
 
     return this;
   }
 
 
-  default Tool setSelectedClasses(List<String> fullyQualifiedClassNames) {
+  default Program setSelectedClasses(List<String> fullyQualifiedClassNames) {
     return setSelectPatterns(fullyQualifiedClassNames);
   }
 
-  Tool setToolJar(File toolJar);
+  Program addToolJarToClasspath(File toolJar);
 
-  Tool setWorkingDirectory(Path directory);
+  Program setWorkingDirectory(Path directory);
 }

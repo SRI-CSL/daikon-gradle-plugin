@@ -1,5 +1,6 @@
 package com.sri.gradle.tasks;
 
+import com.sri.gradle.internal.JavaProgram;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -7,19 +8,18 @@ import java.util.List;
 public interface TaskBuilder {
   // TODO(has) add more Daikon's options
   /**
-   * Builds classpath in order to both generate tests
-   * and execute tests. Client can provide additional files
-   * if needed.
+   * Builds the classpath the {@link JavaProgram java tools} need for
+   * their execution. Client code can update this classpath, if needed.
    *
    * Note: this method assumes that the working directory is
-   * the same as the output directory provided at the previous
-   * invocation of {@link OutputBuilder#toDir(File)}. It will
-   * fail if this output directory is null.
+   * the same as the output directory set after calling the
+   * {@link OutputBuilder#toDir(File)} method. The {@link TaskBuilder}
+   * will throw an exception if this output directory is null.
    *
    * @param files additional files
    * @return a reference to the task builder
    */
-  default OutputBuilder withClasspath(File... files){
+  default OutputBuilder withClasspath(File... files) {
     return withClasspath(Arrays.asList(files));
   }
 

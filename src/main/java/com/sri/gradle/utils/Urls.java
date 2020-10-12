@@ -1,10 +1,19 @@
 package com.sri.gradle.utils;
 
+import com.sri.gradle.Constants;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 public class Urls {
+
+  public static String toURLStr(Collection<URL> urls){
+    return urls.stream()
+        .map(URL::toString)
+        .collect(Collectors.joining(Constants.PATH_SEPARATOR));
+  }
 
   public static URL toURL(String filepath) throws RuntimeException {
     final URL source;

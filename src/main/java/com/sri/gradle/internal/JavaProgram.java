@@ -11,37 +11,38 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.stream.Stream;
 
-public abstract class AbstractTool implements Tool {
+public abstract class JavaProgram implements Program {
 
   private final Command.Builder builder;
 
-  private final List<URL> classpathUrls;
+  private final List<URL> classpathUrls = new LinkedList<>();
   private Object[] args = new Object[0];
 
-  public AbstractTool() {
+  public JavaProgram() {
     this.builder = Command.create()
         .arguments("java")
         .arguments("-Xmx4G")
         .permitNonZeroExitStatus();
-
-    this.classpathUrls = new LinkedList<>();
   }
 
   public Object[] getArgs() {
     return args;
   }
 
-  @Override public void args(Object... args) {
+  @Override
+  public void args(Object... args) {
     this.args = Stream.concat(
         stream(this.args), stream(args)).toArray(Object[]::new);
   }
 
-  @Override public Tool setToolJar(File toolJar) {
+  @Override
+  public Program addToolJarToClasspath(File toolJar) {
     getClasspath().add(Urls.toURL(toolJar.getAbsolutePath()));
     return this;
   }
 
-  @Override public Tool setClasspath(List<URL> classpathUrls) {
+  @Override
+  public Program setClasspath(List<URL> classpathUrls) {
     this.classpathUrls.clear();
     this.classpathUrls.addAll(classpathUrls);
     return this;
@@ -55,7 +56,8 @@ public abstract class AbstractTool implements Tool {
     return builder;
   }
 
-  @Override public Tool setWorkingDirectory(Path directory) {
+  @Override
+  public Program setWorkingDirectory(Path directory) {
     builder.workingDirectory(directory.toFile());
     return this;
   }
