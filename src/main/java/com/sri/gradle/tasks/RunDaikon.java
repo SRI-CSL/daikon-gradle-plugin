@@ -29,41 +29,39 @@ public class RunDaikon extends AbstractNamedTask {
 
   public RunDaikon() {
     this.outputDir = getProject().getObjects().directoryProperty(); // unchecked warning
-    this.requires = getProject().getObjects().directoryProperty();  // unchecked warning
+    this.requires = getProject().getObjects().directoryProperty(); // unchecked warning
     this.testDriverPackage = getProject().getObjects().property(String.class); // unchecked warning
-    this.generateTestDriver = getProject().getObjects().property(Boolean.class); // unchecked warning
+    this.generateTestDriver =
+        getProject().getObjects().property(Boolean.class); // unchecked warning
   }
 
-  @TaskAction public void daikonRun() {
+  @TaskAction
+  public void daikonRun() {
     final TaskExecutorImpl executor = new TaskExecutorImpl();
 
     final DirectoryProperty buildDir = JavaProjectHelper.getBuildDir(getProject());
 
     final Directory buildMainDir = JavaProjectHelper.getBuildMainDir(buildDir);
     final Directory buildTestDir = JavaProjectHelper.getBuildTestDir(buildDir);
-    final Directory testClassesDir = JavaProjectHelper
-        .getTestClassesDir(getTestDriverPackage(), buildTestDir);
+    final Directory testClassesDir =
+        JavaProjectHelper.getTestClassesDir(getTestDriverPackage(), buildTestDir);
 
-    if (testClassesDir == null){
+    if (testClassesDir == null) {
       throw new GradleException("Unable to find the test driver directory");
     }
 
     File inputDir = testClassesDir.getAsFile();
 
     // jar files under the directory specified in the build.gradle's `requires` statement
-    final File dependenciesDir = getRequires()
-        .getAsFile()
-        .get();
+    final File dependenciesDir = getRequires().getAsFile().get();
 
-    final List<File> classpath = new LinkedList<>(
-        Filefinder.findJavaJars(dependenciesDir.toPath()));
+    final List<File> classpath =
+        new LinkedList<>(Filefinder.findJavaJars(dependenciesDir.toPath()));
 
     classpath.add(buildMainDir.getAsFile());
     classpath.add(buildTestDir.getAsFile());
 
-    final File outputDir = getOutputDir()
-        .getAsFile()
-        .get();
+    final File outputDir = getOutputDir().getAsFile().get();
 
     if (!Files.exists(outputDir.toPath())) {
       if (!outputDir.mkdir()) {
@@ -72,15 +70,11 @@ public class RunDaikon extends AbstractNamedTask {
     }
 
     // If a test driver is needed, fetch the testDriverPackage value; otherwise fetch a null value
-    final String testDriverPackage = getGenerateTestDriver().get() ? getTestDriverPackage().get() : null;
+    final String testDriverPackage =
+        getGenerateTestDriver().get() ? getTestDriverPackage().get() : null;
 
-    final RunDaikonConfiguration config = new RunDaikonConfiguration(
-        inputDir,
-        testDriverPackage,
-        getProject(),
-        classpath,
-        outputDir
-    );
+    final RunDaikonConfiguration config =
+        new RunDaikonConfiguration(inputDir, testDriverPackage, getProject(), classpath, outputDir);
 
     getLogger().debug("Created RunDaikon task configuration");
     executor.install(config);
@@ -91,27 +85,34 @@ public class RunDaikon extends AbstractNamedTask {
     getLogger().quiet(Constants.SUCCESSFUL_DAIKON_EXECUTION);
   }
 
-  @OutputDirectory public DirectoryProperty getOutputDir() {
+  @OutputDirectory
+  public DirectoryProperty getOutputDir() {
     return this.outputDir;
   }
 
-  @InputDirectory public DirectoryProperty getRequires() {
+  @InputDirectory
+  public DirectoryProperty getRequires() {
     return this.requires;
   }
 
-  @Input public Property<String> getTestDriverPackage() {
+  @Input
+  public Property<String> getTestDriverPackage() {
     return this.testDriverPackage;
   }
 
-  @Optional @Input public Property<Boolean> getGenerateTestDriver() {
+  @Optional
+  @Input
+  public Property<Boolean> getGenerateTestDriver() {
     return this.generateTestDriver;
   }
 
-  @Override protected String getTaskName() {
+  @Override
+  protected String getTaskName() {
     return Constants.DAIKON_TASK;
   }
 
-  @Override protected String getTaskDescription() {
+  @Override
+  protected String getTaskDescription() {
     return Constants.DAIKON_TASK_DESCRIPTION;
   }
 
@@ -123,8 +124,12 @@ public class RunDaikon extends AbstractNamedTask {
     private final List<File> classpath;
     private final File outputDir;
 
-    RunDaikonConfiguration(File inputDir, String testDriverPackage,
-      Project project, List<File> classpath, File outputDir) {
+    RunDaikonConfiguration(
+        File inputDir,
+        String testDriverPackage,
+        Project project,
+        List<File> classpath,
+        File outputDir) {
       this.inputDir = inputDir;
       this.testDriverPackage = testDriverPackage;
       this.project = project;
@@ -132,16 +137,18 @@ public class RunDaikon extends AbstractNamedTask {
       this.outputDir = outputDir;
     }
 
-    @Override protected void configure() {
-      TaskBuilder builder = testDriverPackage == null
-          ? runDaikonOn(new InputProviderImpl(2, inputDir, project))
-          : runDaikonOn(new InputProviderImpl(3, inputDir, testDriverPackage, project));
+    @Override
+    protected void configure() {
+      TaskBuilder builder =
+          testDriverPackage == null
+              ? runDaikonOn(new InputProviderImpl(2, inputDir, project))
+              : runDaikonOn(new InputProviderImpl(3, inputDir, testDriverPackage, project));
 
       builder.withClasspath(classpath).toDir(outputDir);
     }
   }
 
-  static abstract class AbstractConfiguration implements TaskConfiguration {
+  abstract static class AbstractConfiguration implements TaskConfiguration {
 
     TaskExecutor executor;
 
@@ -161,16 +168,12 @@ public class RunDaikon extends AbstractNamedTask {
 
     protected abstract void configure();
 
-    /**
-     * @see TaskExecutor#runDaikonOn(InputProvider)
-     */
+    /** @see TaskExecutor#runDaikonOn(InputProvider) */
     protected TaskBuilder runDaikonOn(InputProvider inputProvider) {
       return executor.runDaikonOn(inputProvider);
     }
 
-    /**
-     * @see TaskExecutor#addError(Throwable)
-     */
+    /** @see TaskExecutor#addError(Throwable) */
     protected void addError(Throwable t) {
       executor.addError(t);
     }

@@ -10,9 +10,9 @@ public interface Program {
 
   /**
    * Executes the tool given its previous configuration.
-   * @throws JavaProgramException if Daikon is not found either in the project's classpath
-   *  or in the path provided by the user in the project's build.gradle (i.e., requires(x)
-   *  statement)
+   *
+   * @throws JavaProgramException if Daikon is not found either in the project's classpath or in the
+   *     path provided by the user in the project's build.gradle (i.e., requires(x) statement)
    */
   void execute() throws JavaProgramException;
 
@@ -82,7 +82,6 @@ public interface Program {
 
     return this;
   }
-
 
   default Program setSelectedClasses(List<String> fullyQualifiedClassNames) {
     return setSelectPatterns(fullyQualifiedClassNames);

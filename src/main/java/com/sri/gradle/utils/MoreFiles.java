@@ -16,18 +16,16 @@ public class MoreFiles {
    *
    * @param path file path
    */
-  public static void deleteFile(Path path){
+  public static void deleteFile(Path path) {
     try {
       Files.delete(path);
-    } catch (IOException ignored){}
+    } catch (IOException ignored) {
+    }
   }
 
   public static List<String> getClassNames(List<File> javaFiles) {
     return ImmutableStream.listCopyOf(
-        javaFiles.stream()
-            .map(MoreFiles::getClassName)
-            .filter(Objects::nonNull)
-    );
+        javaFiles.stream().map(MoreFiles::getClassName).filter(Objects::nonNull));
   }
 
   public static String getClassName(File fromFile) {
@@ -36,19 +34,22 @@ public class MoreFiles {
     try {
       final String canonicalPath = fromFile.getCanonicalPath();
       return getClassName(canonicalPath);
-    } catch (IOException ignored) {}
+    } catch (IOException ignored) {
+    }
 
     return null;
   }
 
   public static String getClassName(String canonicalPath) {
-    String deletingPrefix = canonicalPath.substring(
-        0, canonicalPath.indexOf(Constants.PROJECT_TEST_CLASS_DIR));
-    deletingPrefix = (deletingPrefix  + Constants.PROJECT_TEST_CLASS_DIR) + Constants.FILE_SEPARATOR;
+    String deletingPrefix =
+        canonicalPath.substring(0, canonicalPath.indexOf(Constants.PROJECT_TEST_CLASS_DIR));
+    deletingPrefix = (deletingPrefix + Constants.PROJECT_TEST_CLASS_DIR) + Constants.FILE_SEPARATOR;
 
     String trimmedCanonicalPath = canonicalPath.replace(deletingPrefix, Constants.EMPTY_STRING);
-    trimmedCanonicalPath = trimmedCanonicalPath.replaceAll(".class", Constants.EMPTY_STRING)
-        .replaceAll(Constants.FILE_SEPARATOR, Constants.PERIOD);
+    trimmedCanonicalPath =
+        trimmedCanonicalPath
+            .replaceAll(".class", Constants.EMPTY_STRING)
+            .replaceAll(Constants.FILE_SEPARATOR, Constants.PERIOD);
     return trimmedCanonicalPath;
   }
 }

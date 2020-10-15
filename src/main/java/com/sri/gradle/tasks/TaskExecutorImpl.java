@@ -30,7 +30,8 @@ public class TaskExecutorImpl implements TaskExecutor {
     }
   }
 
-  @Override public TaskBuilder runDaikonOn(InputProvider provider) {
+  @Override
+  public TaskBuilder runDaikonOn(InputProvider provider) {
     Preconditions.checkArgument(provider != null);
     Preconditions.checkArgument(provider.size() == 2 || provider.size() == 3);
 
@@ -59,17 +60,21 @@ public class TaskExecutorImpl implements TaskExecutor {
     final Path outputDir = each.getOutputDir();
     final List<File> classpath = each.getClasspath();
 
-    final List<File>    allTestClasses  = Filefinder.findJavaClasses(classesDir, "$"/*exclude those that contain this symbol*/);
-    final List<String>  allClassnames = MoreFiles.getClassNames(allTestClasses);
+    final List<File> allTestClasses =
+        Filefinder.findJavaClasses(classesDir, "$" /*exclude those that contain this symbol*/);
+    final List<String> allClassnames = MoreFiles.getClassNames(allTestClasses);
 
     // TODO(has) Consider changing this. Some projects may have
     //  more than one test driver.
-    String mainClass  = allClassnames.stream()
-        .filter(Constants.EXPECTED_JUNIT4_NAME_REGEX.asPredicate())
-        .filter(f -> f.endsWith(Constants.TEST_DRIVER))
-        .findFirst().orElse(null);
+    String mainClass =
+        allClassnames
+            .stream()
+            .filter(Constants.EXPECTED_JUNIT4_NAME_REGEX.asPredicate())
+            .filter(f -> f.endsWith(Constants.TEST_DRIVER))
+            .findFirst()
+            .orElse(null);
 
-    if(mainClass == null){
+    if (mainClass == null) {
       each.getGradleProject().getLogger().debug("Not main class for DynComp operation");
       return;
     }
@@ -83,42 +88,58 @@ public class TaskExecutorImpl implements TaskExecutor {
     executeDaikon(mainClass, prefix, classpath, classesDir, outputDir);
   }
 
-  private static void executeDaikon(String mainClass, String namePrefix, List<File> classpath, Path testClassDir, Path outputDir) {
-    final Program daikon = new Daikon()
-        .setClasspath(classpath)
-        .setWorkingDirectory(testClassDir)
-        .setMainClass(mainClass)
-        .setDtraceFile(outputDir, namePrefix + ".dtrace.gz")
-        .setStandardOutput(outputDir.resolve(namePrefix + ".inv.gz").toFile().getAbsolutePath());
+  private static void executeDaikon(
+      String mainClass,
+      String namePrefix,
+      List<File> classpath,
+      Path testClassDir,
+      Path outputDir) {
+    final Program daikon =
+        new Daikon()
+            .setClasspath(classpath)
+            .setWorkingDirectory(testClassDir)
+            .setMainClass(mainClass)
+            .setDtraceFile(outputDir, namePrefix + ".dtrace.gz")
+            .setStandardOutput(
+                outputDir.resolve(namePrefix + ".inv.gz").toFile().getAbsolutePath());
 
     daikon.execute();
   }
 
-  private static void executeChicory(String mainClass, String namePrefix, List<String> allQualifiedClasses,
-      List<File> classpath, Path testClassDir, Path outputDir) {
-    final Program chicory = new Chicory()
-        .setClasspath(classpath)
-        .setWorkingDirectory(outputDir)
-        .setMainClass(mainClass)
-        .setSelectedClasses(allQualifiedClasses)
-        // TODO(has) seems that workingDirectory is affecting the output setting behavior.
-//        .setOutputDirectory(outputDir)
-        .setComparabilityFile(outputDir, namePrefix + ".decls-DynComp");
+  private static void executeChicory(
+      String mainClass,
+      String namePrefix,
+      List<String> allQualifiedClasses,
+      List<File> classpath,
+      Path testClassDir,
+      Path outputDir) {
+    final Program chicory =
+        new Chicory()
+            .setClasspath(classpath)
+            .setWorkingDirectory(outputDir)
+            .setMainClass(mainClass)
+            .setSelectedClasses(allQualifiedClasses)
+            // TODO(has) seems that workingDirectory is affecting the output setting behavior.
+            //        .setOutputDirectory(outputDir)
+            .setComparabilityFile(outputDir, namePrefix + ".decls-DynComp");
 
     chicory.execute();
   }
 
-  private static void executeDynComp(String mainClass, List<String> allQualifiedClasses,
-      List<File> classpath, Path testClassDir, Path outputDir) {
-    final Program dynComp = new DynComp()
-        .setClasspath(classpath)
-        .setWorkingDirectory(testClassDir)
-        .setMainClass(mainClass)
-        .setSelectedClasses(allQualifiedClasses)
-        .setOutputDirectory(outputDir);
+  private static void executeDynComp(
+      String mainClass,
+      List<String> allQualifiedClasses,
+      List<File> classpath,
+      Path testClassDir,
+      Path outputDir) {
+    final Program dynComp =
+        new DynComp()
+            .setClasspath(classpath)
+            .setWorkingDirectory(testClassDir)
+            .setMainClass(mainClass)
+            .setSelectedClasses(allQualifiedClasses)
+            .setOutputDirectory(outputDir);
 
     dynComp.execute();
   }
-
-
 }

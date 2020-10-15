@@ -8,29 +8,25 @@ import org.gradle.api.tasks.TaskAction;
 
 public class CheckForDaikon extends AbstractNamedTask {
 
-  @TaskAction public void daikonCheck() {
+  @TaskAction
+  public void daikonCheck() {
     try {
-      final File daikonJar = getJarfile(
-          Constants.DAIKON_JAR_FILE
-      );
+      final File daikonJar = getJarfile(Constants.DAIKON_JAR_FILE);
 
-      new Daikon()
-          .addToolJarToClasspath(daikonJar)
-          .help()
-          .execute();
+      new Daikon().addToolJarToClasspath(daikonJar).help().execute();
 
     } catch (Exception e) {
       throw new GradleException(Constants.UNEXPECTED_ERROR);
     }
-
-
   }
 
-  @Override protected String getTaskDescription() {
+  @Override
+  protected String getTaskDescription() {
     return Constants.CHECK_DAIKON_TASK_DESCRIPTION;
   }
 
-  @Override protected String getTaskName() {
+  @Override
+  protected String getTaskName() {
     return Constants.CHECK_DAIKON_TASK;
   }
 }

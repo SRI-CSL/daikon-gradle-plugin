@@ -13,7 +13,7 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 
 public class JavaProjectHelper {
-  private JavaProjectHelper(){
+  private JavaProjectHelper() {
     throw new Error("Cannot be instantiated");
   }
 
@@ -53,53 +53,48 @@ public class JavaProjectHelper {
     return taskType.cast(task(project, taskName));
   }
 
-  public static <T extends Task> Optional<T> findTask(Project project, String taskName, Class<T> taskType) {
+  public static <T extends Task> Optional<T> findTask(
+      Project project, String taskName, Class<T> taskType) {
     return findTask(project, taskName).map(taskType::cast);
   }
 
   public static DirectoryProperty getBuildDir(Project project) {
     Objects.requireNonNull(project);
-    return project
-        .getLayout()
-        .getBuildDirectory();
+    return project.getLayout().getBuildDirectory();
   }
 
-  public static Directory getBuildMainDir(DirectoryProperty buildDir){
-    return buildDir
-        .dir(Constants.PROJECT_MAIN_CLASS_DIR)
-        .get();
+  public static Directory getBuildMainDir(DirectoryProperty buildDir) {
+    return buildDir.dir(Constants.PROJECT_MAIN_CLASS_DIR).get();
   }
 
-  public static Directory getBuildTestDir(DirectoryProperty buildDir){
-    return buildDir
-        .dir(Constants.PROJECT_TEST_CLASS_DIR)
-        .get();
+  public static Directory getBuildTestDir(DirectoryProperty buildDir) {
+    return buildDir.dir(Constants.PROJECT_TEST_CLASS_DIR).get();
   }
 
-  public static Directory getTestClassesDir(Property<String> testDriverPackage, Directory buildTestDir){
+  public static Directory getTestClassesDir(
+      Property<String> testDriverPackage, Directory buildTestDir) {
     Objects.requireNonNull(buildTestDir);
 
     return getTestDriverOutputDir(testDriverPackage, buildTestDir);
   }
 
-  public static Directory getTestClassesDir(Property<String> testDriverPackage, Project project){
+  public static Directory getTestClassesDir(Property<String> testDriverPackage, Project project) {
     return getTestClassesDir(testDriverPackage, getBuildTestDir(getBuildDir(project)));
   }
 
-  public static SourceSet getSourceSet(String taskName, Project project){
+  public static SourceSet getSourceSet(String taskName, Project project) {
     Objects.requireNonNull(taskName);
     Objects.requireNonNull(project);
-    return ((SourceSetContainer) project
-        .getProperties().get("sourceSets"))
-        .getByName(taskName);
+    return ((SourceSetContainer) project.getProperties().get("sourceSets")).getByName(taskName);
   }
 
-  public static Directory getTestDriverOutputDir(Property<String> testDriverPackage, Directory outputDir){
+  public static Directory getTestDriverOutputDir(
+      Property<String> testDriverPackage, Directory outputDir) {
     Objects.requireNonNull(testDriverPackage);
     Objects.requireNonNull(testDriverPackage.get());
     Objects.requireNonNull(outputDir);
 
-    if (testDriverPackage.get().isEmpty()){
+    if (testDriverPackage.get().isEmpty()) {
       return null;
     }
 

@@ -9,7 +9,7 @@ class InputProviderImpl implements InputProvider {
 
   InputProviderImpl(int size, Object... content) {
     final List<Object> objs = new LinkedList<>();
-    for (Object each : content){
+    for (Object each : content) {
       if (each == null) continue;
       if (objs.size() == size) break;
       objs.add(each);
@@ -20,8 +20,8 @@ class InputProviderImpl implements InputProvider {
     this.inputContent = objs.toArray();
   }
 
-  @Override public Object[] get() {
+  @Override
+  public Object[] get() {
     return this.inputContent;
   }
-
 }

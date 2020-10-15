@@ -27,7 +27,8 @@ public class CompileTestJavaTaskMutator {
   }
 
   public void mutateJavaCompileTask(JavaCompile javaCompile) {
-    final Directory testClassesDir = JavaProjectHelper.getBuildTestDir(JavaProjectHelper.getBuildDir(project));
+    final Directory testClassesDir =
+        JavaProjectHelper.getBuildTestDir(JavaProjectHelper.getBuildDir(project));
     List<String> compilerArgs = buildCompilerArgs(javaCompile);
     javaCompile.getOptions().setCompilerArgs(compilerArgs);
     Set<File> runtimeClasspath = RuntimeClasspath.getFiles(project);
@@ -38,18 +39,25 @@ public class CompileTestJavaTaskMutator {
 
   // Setting the sourcepath is necessary when using forked compilation for module-info.java
   private void configureSourcepath(JavaCompile javaCompile) {
-    SourceDirectorySet sds = javaCompile.getProject().getObjects().sourceDirectorySet("driver", "driver").srcDir(JavaProjectHelper.getDriverDir(javaCompile.getProject()));
+    SourceDirectorySet sds =
+        javaCompile
+            .getProject()
+            .getObjects()
+            .sourceDirectorySet("driver", "driver")
+            .srcDir(JavaProjectHelper.getDriverDir(javaCompile.getProject()));
     final SourceSet sourceSet = JavaProjectHelper.testSourceSet(project);
     final Set<File> newSourceSet = new HashSet<>(sourceSet.getJava().getSrcDirs());
     newSourceSet.add(JavaProjectHelper.getDriverDir(javaCompile.getProject()));
-    newSourceSet.stream()
+    newSourceSet
+        .stream()
         .map(srcDir -> srcDir.toPath().resolve(Constants.TEST_DRIVER_CLASSNAME + ".java"))
         .filter(Files::exists)
         .findFirst()
-        .ifPresent(path -> {
-          javaCompile.setSource(sds);
-          javaCompile.getOptions().setSourcepath(project.files(path.getParent()));
-        });
+        .ifPresent(
+            path -> {
+              javaCompile.setSource(sds);
+              javaCompile.getOptions().setSourcepath(project.files(path.getParent()));
+            });
   }
 
   private List<String> buildCompilerArgs(JavaCompile javaCompile) {

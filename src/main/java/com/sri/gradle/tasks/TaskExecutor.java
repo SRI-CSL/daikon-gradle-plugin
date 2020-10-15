@@ -11,13 +11,13 @@ import org.gradle.api.Project;
 /**
  * Wraps DynComp, Chicory, and Daikon into a single task:
  *
- * runDaikonOn(new InputProvider(inputDirectory, testDriverPackage (optional), GradleProject))
- *  .withClasspath(file1, file2, ...) or .withClasspath(Collection(File))
- *  .toDir(..)
+ * <p>runDaikonOn(new InputProvider(inputDirectory, testDriverPackage (optional), GradleProject))
+ * .withClasspath(file1, file2, ...) or .withClasspath(Collection(File)) .toDir(..)
  */
 public interface TaskExecutor {
   /**
    * Caches an error.
+   *
    * @param cause thrown exception.
    */
   void addError(Throwable cause);
@@ -34,15 +34,13 @@ public interface TaskExecutor {
   /**
    * Likely-Invariants extraction is applied to a type of input (specified by {@code Provider}).
    *
-   * @param provider the input provider, which contains an {@link File input directory},
-   *                 {@link String testDriverPackage} (Optional), and the {@link Project gradle project}.
+   * @param provider the input provider, which contains an {@link File input directory}, {@link
+   *     String testDriverPackage} (Optional), and the {@link Project gradle project}.
    * @return a new TaskBuilder object.
    */
   TaskBuilder runDaikonOn(InputProvider provider);
 
-  /**
-   * Executes installed configuration
-   */
+  /** Executes installed configuration */
   void execute() throws TaskConfigurationError;
 
   class TaskConfigurationError extends RuntimeException {
@@ -61,15 +59,14 @@ public interface TaskExecutor {
       int index = 1;
 
       for (Throwable errorMessage : encounteredErrors) {
-        final String    message = errorMessage.getLocalizedMessage();
-        final String    line    = "line " + message.charAt(message.lastIndexOf("line") + 5);
+        final String message = errorMessage.getLocalizedMessage();
+        final String line = "line " + message.charAt(message.lastIndexOf("line") + 5);
         messageFormatter.format("%s) Error at %s:%n", index++, line).format(" %s%n%n", message);
       }
 
       return messageFormatter.format("%s error[s]", encounteredErrors.size()).toString();
     }
   }
-
 
   class ThrowableComparator implements Comparator<Throwable> {
     @Override

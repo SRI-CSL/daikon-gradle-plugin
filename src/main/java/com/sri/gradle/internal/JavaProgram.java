@@ -17,10 +17,7 @@ public abstract class JavaProgram implements Program {
   private Object[] args = new Object[0];
 
   public JavaProgram() {
-    this.builder = Command.create()
-        .arguments("java")
-        .arguments("-Xmx4G")
-        .permitNonZeroExitStatus();
+    this.builder = Command.create().arguments("java").arguments("-Xmx4G").permitNonZeroExitStatus();
   }
 
   public Object[] getArgs() {
@@ -29,8 +26,7 @@ public abstract class JavaProgram implements Program {
 
   @Override
   public void args(Object... args) {
-    this.args = Stream.concat(
-        stream(this.args), stream(args)).toArray(Object[]::new);
+    this.args = Stream.concat(stream(this.args), stream(args)).toArray(Object[]::new);
   }
 
   @Override

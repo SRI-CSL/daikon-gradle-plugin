@@ -8,13 +8,12 @@ import java.util.List;
 public interface TaskBuilder {
   // TODO(has) add more Daikon's options
   /**
-   * Builds the classpath the {@link JavaProgram java tools} need for
-   * their execution. Client code can update this classpath, if needed.
+   * Builds the classpath the {@link JavaProgram java tools} need for their execution. Client code
+   * can update this classpath, if needed.
    *
-   * Note: this method assumes that the working directory is
-   * the same as the output directory set after calling the
-   * {@link OutputBuilder#toDir(File)} method. The {@link TaskBuilder}
-   * will throw an exception if this output directory is null.
+   * <p>Note: this method assumes that the working directory is the same as the output directory set
+   * after calling the {@link OutputBuilder#toDir(File)} method. The {@link TaskBuilder} will throw
+   * an exception if this output directory is null.
    *
    * @param files additional files
    * @return a reference to the task builder

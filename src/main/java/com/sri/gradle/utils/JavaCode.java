@@ -28,15 +28,13 @@ public class JavaCode {
     return new Builder().addClass(className);
   }
 
-
   /**
    * Writes this to {@code directory}.
    *
    * @param outputDir the output {@code directory}
-   *
    * @return the {@link File} instance to which source is actually written; otherwise a null object.
    */
-  public File writeTo(File outputDir){
+  public File writeTo(File outputDir) {
     File generatedJavaFile = null;
     try {
       if (!Files.exists(outputDir.toPath())) {
@@ -44,7 +42,8 @@ public class JavaCode {
       }
 
       generatedJavaFile = writeToFile(outputDir);
-    } catch (IOException ignored){}
+    } catch (IOException ignored) {
+    }
 
     return generatedJavaFile;
   }
@@ -61,6 +60,7 @@ public class JavaCode {
 
   /**
    * Writes this to {@code directory} as UTF-8 using the standard directory structure.
+   *
    * @return the {@link Path} instance to which source is actually written.
    */
   private Path writeToPath(Path directory) throws IOException {
@@ -70,14 +70,17 @@ public class JavaCode {
   /**
    * Writes this to {@code directory} with the provided {@code charset} using the standard directory
    * structure.
+   *
    * @return the {@link Path} instance to which source is actually written.
    */
   private Path writeToPath(Path directory, Charset charset) throws IOException {
-    Preconditions.checkArgument(Files.notExists(directory) || Files.isDirectory(directory),
-        "path %s exists but is not a directory.", directory);
+    Preconditions.checkArgument(
+        Files.notExists(directory) || Files.isDirectory(directory),
+        "path %s exists but is not a directory.",
+        directory);
 
     Path outputPath = directory.resolve(Constants.TEST_DRIVER_CLASSNAME + ".java");
-    if (Files.exists(outputPath)){
+    if (Files.exists(outputPath)) {
       Files.delete(outputPath);
     }
 
@@ -88,7 +91,8 @@ public class JavaCode {
     return outputPath;
   }
 
-  @Override public String toString() {
+  @Override
+  public String toString() {
     return content;
   }
 
@@ -133,7 +137,7 @@ public class JavaCode {
       }
     }
 
-    public Builder addClass(String typeName){
+    public Builder addClass(String typeName) {
       Preconditions.checkArgument(typeName != null && !typeName.isEmpty());
       this.className = typeName;
       return this;
@@ -204,8 +208,8 @@ public class JavaCode {
     }
 
     public Builder addComment(String comment) {
-      String newLine = addAndIndent(("// " + Objects.requireNonNull(comment)) + Constants.NEW_LINE,
-          indentLevel);
+      String newLine =
+          addAndIndent(("// " + Objects.requireNonNull(comment)) + Constants.NEW_LINE, indentLevel);
       this.code = this.code == null ? newLine : this.code + newLine;
       return this;
     }
@@ -215,8 +219,8 @@ public class JavaCode {
     }
 
     public Builder addLine(String codeLine) {
-      String newLine = addAndIndent(Objects.requireNonNull(codeLine) + Constants.NEW_LINE,
-          indentLevel);
+      String newLine =
+          addAndIndent(Objects.requireNonNull(codeLine) + Constants.NEW_LINE, indentLevel);
       this.code = this.code == null ? newLine : this.code + newLine;
       return this;
     }
@@ -234,6 +238,5 @@ public class JavaCode {
       indentLevel = Math.max(0, --indentLevel);
       return this;
     }
-
   }
 }
