@@ -71,7 +71,6 @@ public class Command {
    *
    * @param stdout standard output
    * @param stderr standard error output
-   *
    * @return self to facilitate method chaining
    */
   public static Builder create(PrintStream stdout, PrintStream stderr) {
@@ -276,7 +275,7 @@ public class Command {
     }
 
     /**
-     * Sets an environment variable.
+     * Sets an environment's variable.
      *
      * @param key   key identifying the variable
      * @param value the value of the variable

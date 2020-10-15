@@ -1,9 +1,8 @@
 package com.sri.gradle.tasks;
 
 import com.google.common.base.Predicates;
-import com.sri.gradle.utils.Urls;
+import com.sri.gradle.utils.RuntimeClasspath;
 import java.io.File;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -20,7 +19,7 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
   private final String testDriverPackage;
   private final Project gradleProject;
 
-  private final List<URL> classpathUrls;
+  private final List<File> classpath;
 
   public TaskBuilderImpl(InputProvider provider, TaskExecutorImpl executor){
     // TODO(has) consider re-designing InputProvider's API. Fetching
@@ -43,13 +42,13 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
     this.executor = executor;
     this.testClassesDir = testClassesDir;
     this.outputDir = null;
-    this.classpathUrls = new LinkedList<>();
+    this.classpath = new LinkedList<>();
     this.testDriverPackage = testDriverPackage;
     this.gradleProject = gradleProject;
   }
 
-  public List<URL> getClasspath(){
-    return classpathUrls;
+  public List<File> getClasspath(){
+    return classpath;
   }
 
   public Project getGradleProject(){
@@ -104,8 +103,10 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
   public OutputBuilder withClasspath(List<File> files) {
     for (File each : files) {
       if (each == null) continue;
-      classpathUrls.add(Urls.toURL(each.getAbsolutePath()));
+      classpath.add(each);
     }
+
+    classpath.addAll(RuntimeClasspath.getFiles(getGradleProject()));
 
     return this;
   }

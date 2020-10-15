@@ -3,32 +3,45 @@ package com.sri.gradle.utils;
 import com.sri.gradle.Constants;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
 public class MoreFiles {
   private MoreFiles() {}
 
-  public static List<String> getFullyQualifiedNames(List<File> javaFiles) {
+  /**
+   * Deletes file in path.
+   *
+   * @param path file path
+   */
+  public static void deleteFile(Path path){
+    try {
+      Files.delete(path);
+    } catch (IOException ignored){}
+  }
+
+  public static List<String> getClassNames(List<File> javaFiles) {
     return ImmutableStream.listCopyOf(
         javaFiles.stream()
-            .map(MoreFiles::getFullyQualifiedName)
+            .map(MoreFiles::getClassName)
             .filter(Objects::nonNull)
     );
   }
 
-  public static String getFullyQualifiedName(File fromFile) {
+  public static String getClassName(File fromFile) {
     if (fromFile == null) throw new IllegalArgumentException("File is null");
 
     try {
       final String canonicalPath = fromFile.getCanonicalPath();
-      return getFullyQualifiedName(canonicalPath);
+      return getClassName(canonicalPath);
     } catch (IOException ignored) {}
 
     return null;
   }
 
-  public static String getFullyQualifiedName(String canonicalPath) {
+  public static String getClassName(String canonicalPath) {
     String deletingPrefix = canonicalPath.substring(
         0, canonicalPath.indexOf(Constants.PROJECT_TEST_CLASS_DIR));
     deletingPrefix = (deletingPrefix  + Constants.PROJECT_TEST_CLASS_DIR) + Constants.FILE_SEPARATOR;

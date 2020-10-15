@@ -18,19 +18,20 @@ public class DaikonPluginTest {
     Path dir = new File("src/main/java/com/sri/gradle/utils").toPath();
     System.out.println(dir);
     List<File> filesAvailable = Filefinder.findJavaFiles(dir);
-    assertThat(filesAvailable.size(), is(5));
+    assertThat(filesAvailable.size(), is(7));
   }
 
   @Test public void testCommandBuilder() {
-    List<String> filesAvailable = Command.create().arguments("ls")
+    List<String> echoResult = Command.create().arguments("echo", "hello")
         .permitNonZeroExitStatus().execute();
 
-    assertThat(filesAvailable.size(), is(9));
+    assertThat(echoResult.size(), is(1));
+    assertEquals(echoResult.get(0), "hello");
   }
 
   @Test public void testFQNExtractor() {
     final String canonicalPath = "daikon-gradle-plugin/consumer/build/classes/java/test/com/foo/FooStuffTestDriver.class";
-    final String fqn = MoreFiles.getFullyQualifiedName(canonicalPath);
+    final String fqn = MoreFiles.getClassName(canonicalPath);
 
     assertNotNull(fqn);
     assertEquals("com.foo.FooStuffTestDriver", fqn);

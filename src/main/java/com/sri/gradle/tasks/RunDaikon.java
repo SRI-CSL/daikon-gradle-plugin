@@ -2,6 +2,7 @@ package com.sri.gradle.tasks;
 
 import com.sri.gradle.Constants;
 import com.sri.gradle.utils.Filefinder;
+import com.sri.gradle.utils.JavaProjectHelper;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.LinkedList;
@@ -14,9 +15,11 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
+@SuppressWarnings("UnstableApiUsage")
 public class RunDaikon extends AbstractNamedTask {
 
   private final DirectoryProperty outputDir;
@@ -24,7 +27,6 @@ public class RunDaikon extends AbstractNamedTask {
   private final Property<String> testDriverPackage;
   private final Property<Boolean> generateTestDriver;
 
-  @SuppressWarnings("UnstableApiUsage")
   public RunDaikon() {
     this.outputDir = getProject().getObjects().directoryProperty(); // unchecked warning
     this.requires = getProject().getObjects().directoryProperty();  // unchecked warning
@@ -35,15 +37,18 @@ public class RunDaikon extends AbstractNamedTask {
   @TaskAction public void daikonRun() {
     final TaskExecutorImpl executor = new TaskExecutorImpl();
 
-    final DirectoryProperty buildDir = getProject()
-        .getLayout()
-        .getBuildDirectory();
+    final DirectoryProperty buildDir = JavaProjectHelper.getBuildDir(getProject());
 
-    final Directory buildMainDir = buildDir.dir(Constants.PROJECT_MAIN_CLASS_DIR).get();
-    final Directory buildTestDir = buildDir.dir(Constants.PROJECT_TEST_CLASS_DIR).get();
+    final Directory buildMainDir = JavaProjectHelper.getBuildMainDir(buildDir);
+    final Directory buildTestDir = JavaProjectHelper.getBuildTestDir(buildDir);
+    final Directory testClassesDir = JavaProjectHelper
+        .getTestClassesDir(getTestDriverPackage(), buildTestDir);
 
-    final String testpath = getTestDriverPackage().get().replaceAll("\\.", Constants.FILE_SEPARATOR);
-    final File inputDir = buildTestDir.dir(testpath).getAsFile();
+    if (testClassesDir == null){
+      throw new GradleException("Unable to find the test driver directory");
+    }
+
+    File inputDir = testClassesDir.getAsFile();
 
     final File dependenciesDir = getRequires()
         .getAsFile()
@@ -81,7 +86,7 @@ public class RunDaikon extends AbstractNamedTask {
 
     getLogger().debug("About to execute task");
     executor.execute();
-    getLogger().quiet(Constants.SUCCESSFUL_EXECUTION);
+    getLogger().quiet(Constants.SUCCESSFUL_DAIKON_EXECUTION);
   }
 
   @OutputDirectory public DirectoryProperty getOutputDir() {
@@ -96,7 +101,7 @@ public class RunDaikon extends AbstractNamedTask {
     return this.testDriverPackage;
   }
 
-  @Input public Property<Boolean> getGenerateTestDriver() {
+  @Optional @Input public Property<Boolean> getGenerateTestDriver() {
     return this.generateTestDriver;
   }
 
