@@ -3,6 +3,7 @@ package com.sri.gradle.tasks;
 import com.sri.gradle.Constants;
 import com.sri.gradle.utils.Filefinder;
 import com.sri.gradle.utils.JavaProjectHelper;
+import com.sri.gradle.utils.MoreFiles;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.LinkedList;
@@ -67,6 +68,9 @@ public class RunDaikon extends AbstractNamedTask {
       if (!outputDir.mkdir()) {
         throw new GradleException("Unable to create output directory");
       }
+
+      // set writable to true
+      MoreFiles.setWritable(outputDir);
     }
 
     // If a test driver is needed, fetch the testDriverPackage value; otherwise fetch a null value
@@ -141,8 +145,8 @@ public class RunDaikon extends AbstractNamedTask {
     protected void configure() {
       TaskBuilder builder =
           testDriverPackage == null
-              ? runDaikonOn(new InputProviderImpl(2, inputDir, project))
-              : runDaikonOn(new InputProviderImpl(3, inputDir, testDriverPackage, project));
+              ? runDaikonOn(new InputProviderImpl(inputDir, project))
+              : runDaikonOn(new InputProviderImpl(inputDir, testDriverPackage, project));
 
       builder.withClasspath(classpath).toDir(outputDir);
     }

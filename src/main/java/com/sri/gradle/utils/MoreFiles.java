@@ -14,6 +14,23 @@ public class MoreFiles {
   }
 
   /**
+   * Sets a file object as a writable file object.
+   *
+   * @param file the file object
+   * @return true if file was set as writable; false otherwise.
+   */
+  public static boolean setWritable(File file) {
+    try {
+      Objects.requireNonNull(file);
+      file.setWritable(true);
+    } catch (Exception ignored) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
    * Deletes file in path.
    *
    * @param path file path

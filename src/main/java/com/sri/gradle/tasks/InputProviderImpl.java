@@ -2,12 +2,15 @@ package com.sri.gradle.tasks;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Objects;
 
 class InputProviderImpl implements InputProvider {
 
   private final Object[] inputContent;
 
-  InputProviderImpl(int size, Object... content) {
+  InputProviderImpl(Object... content) {
+    Objects.requireNonNull(content);
+    int size = content.length;
     final List<Object> objs = new LinkedList<>();
     for (Object each : content) {
       if (each == null) continue;
