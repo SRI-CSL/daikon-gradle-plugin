@@ -21,8 +21,8 @@ public abstract class AbstractNamedTask extends DefaultTask {
   @Internal protected abstract String getTaskDescription();
 
   @SuppressWarnings("SameParameterValue")
-  protected File getJarfile(String jarName){
-    if (!ALLOWED_SET.contains(jarName)){
+  protected File getJarfile(String jarName) {
+    if (!ALLOWED_SET.contains(jarName)) {
       throw new IllegalArgumentException("Unknown options");
     }
 

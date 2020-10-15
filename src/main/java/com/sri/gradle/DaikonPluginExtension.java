@@ -4,6 +4,7 @@ import org.gradle.api.Project;
 import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
 
+@SuppressWarnings("UnstableApiUsage")
 public class DaikonPluginExtension {
 
   private final DirectoryProperty outputDir;
@@ -12,7 +13,6 @@ public class DaikonPluginExtension {
   private final Property<Boolean> generateTestDriver;
 
 
-  @SuppressWarnings("UnstableApiUsage")
   public DaikonPluginExtension(Project project) {
     this.outputDir = project.getObjects().directoryProperty();
     this.requires = project.getObjects().directoryProperty();

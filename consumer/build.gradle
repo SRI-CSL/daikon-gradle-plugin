@@ -22,4 +22,5 @@ runDaikon {
     requires = file("libs")
     outputDir = file("${projectDir}/build/daikon-output")
     testDriverPackage = "com.foo"
+    generateTestDriver = false
 }

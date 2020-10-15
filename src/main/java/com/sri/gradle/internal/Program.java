@@ -2,7 +2,6 @@ package com.sri.gradle.internal;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Collection;
 import java.util.List;
 
 public interface Program {
@@ -22,7 +21,7 @@ public interface Program {
     return this;
   }
 
-  Program setClasspath(Collection<File> aClasspath);
+  Program setClasspath(List<File> files);
 
   default Program setComparabilityFile(Path directory, String filename) {
     final Path resolved = directory.resolve(filename);
@@ -89,7 +88,7 @@ public interface Program {
     return setSelectPatterns(fullyQualifiedClassNames);
   }
 
-  Program setToolJar(File toolJar);
+  Program addToolJarToClasspath(File toolJar);
 
   Program setWorkingDirectory(Path directory);
 }
