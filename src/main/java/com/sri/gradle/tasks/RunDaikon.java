@@ -69,9 +69,18 @@ public class RunDaikon extends AbstractNamedTask {
         throw new GradleException("Unable to create output directory");
       }
 
-      // set writable to true
-      MoreFiles.setWritable(outputDir);
+      getProject().getLogger().debug("Current output directory: " + outputDir);
     }
+
+    if (Files.exists(outputDir.toPath())) {
+      // set writable to true
+      if (!MoreFiles.setWritable(outputDir)) {
+        throw new GradleException("Unable to change output directory permissions");
+      }
+
+      getProject().getLogger().debug("Current permissions for outputDir: " + MoreFiles.getPosixFilePermissions(outputDir).toString());
+    }
+
 
     // If a test driver is needed, fetch the testDriverPackage value; otherwise fetch a null value
     final String testDriverPackage =

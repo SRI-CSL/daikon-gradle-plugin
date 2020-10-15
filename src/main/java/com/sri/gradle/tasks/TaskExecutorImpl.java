@@ -9,6 +9,7 @@ import com.sri.gradle.internal.Program;
 import com.sri.gradle.utils.Filefinder;
 import com.sri.gradle.utils.MoreFiles;
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +59,15 @@ public class TaskExecutorImpl implements TaskExecutor {
   private static void applyBuiltConfiguration(TaskBuilderImpl each) {
     final Path classesDir = each.getTestClassesDir().toPath();
     final Path outputDir = each.getOutputDir();
+
+    each.getGradleProject()
+        .getLogger()
+        .debug(
+            "Output directory "
+                + outputDir
+                + " is "
+                + (Files.isWritable(outputDir) ? "writable." : "not writable."));
+
     final List<File> classpath = each.getClasspath();
 
     final List<File> allTestClasses =

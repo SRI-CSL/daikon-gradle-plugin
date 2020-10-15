@@ -1,12 +1,23 @@
 package com.sri.gradle.utils;
 
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_READ;
+import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_READ;
+import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
+
+import com.google.common.collect.ImmutableSet;
 import com.sri.gradle.Constants;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.PosixFileAttributeView;
+import java.nio.file.attribute.PosixFilePermission;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 
 public class MoreFiles {
   private MoreFiles() {
@@ -22,12 +33,32 @@ public class MoreFiles {
   public static boolean setWritable(File file) {
     try {
       Objects.requireNonNull(file);
-      file.setWritable(true);
+      final PosixFileAttributeView fileAttributes =
+          Files.getFileAttributeView(file.toPath(), PosixFileAttributeView.class);
+      Objects.requireNonNull(fileAttributes);
+      fileAttributes.setPermissions(EnumSet.of(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, OTHERS_READ, OTHERS_WRITE));
     } catch (Exception ignored) {
       return false;
     }
 
     return true;
+  }
+
+  /**
+   * Gets a file object's posix file permissions.
+   *
+   * @param file the file object
+   * @return set of posix file permissions.
+   */
+  public static Set<PosixFilePermission> getPosixFilePermissions(File file) {
+    try {
+      final PosixFileAttributeView fileAttributes =
+          Files.getFileAttributeView(file.toPath(), PosixFileAttributeView.class);
+      Objects.requireNonNull(fileAttributes);
+      return fileAttributes.readAttributes().permissions();
+    } catch (Exception ignored) {
+      return ImmutableSet.of();
+    }
   }
 
   /**
