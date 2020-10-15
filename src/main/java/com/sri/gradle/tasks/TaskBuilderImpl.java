@@ -1,6 +1,7 @@
 package com.sri.gradle.tasks;
 
 import com.google.common.base.Predicates;
+import com.sri.gradle.utils.RuntimeClasspath;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -104,6 +105,8 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
       if (each == null) continue;
       classpath.add(each);
     }
+
+    classpath.addAll(RuntimeClasspath.getFiles(getGradleProject()));
 
     return this;
   }

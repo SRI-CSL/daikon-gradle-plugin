@@ -27,7 +27,7 @@ public class DynComp extends JavaProgram {
           .filter(s -> s.startsWith(Constants.ERROR_MARKER)));
 
       if (!err.isEmpty()) throw new JavaProgramException(Constants.BAD_DAIKON_ERROR);
-    } catch (Exception e) {
+    } catch (RuntimeException e) {
       throw new JavaProgramException(Constants.BAD_DAIKON_ERROR, e);
     }
   }

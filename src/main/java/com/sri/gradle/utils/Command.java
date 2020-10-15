@@ -63,7 +63,7 @@ public class Command {
    * @return self to facilitate method chaining
    */
   public static Builder create() {
-    return create(System.out, System.err);
+    return create(null, null);
   }
 
   /**

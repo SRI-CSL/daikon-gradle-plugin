@@ -1,13 +1,14 @@
 package com.foo;
 
 import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
-public class FooStuffTestDriver {
-  public static void main(String... args) {
-    final FooStuffTestDriver a = new FooStuffTestDriver();
-    a.testEquality();
-  }
+public class FooStuffTest {
+//  public static void main(String... args) {
+//    final FooStuffTest a = new FooStuffTest();
+//    a.testEquality();
+//  }
 
   @Test public void testEquality() {
     Foo x = new Foo();
