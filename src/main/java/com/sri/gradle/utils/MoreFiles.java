@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class MoreFiles {
-  private MoreFiles() {}
+  private MoreFiles() {
+    throw new Error("Cannot be instantiated");
+  }
 
   /**
    * Deletes file in path.

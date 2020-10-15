@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.Set;
 
 public class Filefinder {
-  private Filefinder() {}
+  private Filefinder() {
+    throw new Error("Cannot be instantiated");
+  }
 
   /**
    * List all Java files found in a directory. Skip those ones matching the provide skip hints.
