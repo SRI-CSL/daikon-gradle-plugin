@@ -73,10 +73,11 @@ public class RunDaikon extends AbstractNamedTask {
     }
 
     if (Files.exists(outputDir.toPath())) {
-      // set writable to true
-      if (!MoreFiles.setWritable(outputDir)) {
-        throw new GradleException("Unable to change output directory permissions");
-      }
+      // TODO(has) it seems this is no longer needed.
+//      // set writable to true
+//      if (!MoreFiles.setWritable(outputDir)) {
+//        throw new GradleException("Unable to change output directory permissions");
+//      }
 
       getProject().getLogger().debug("Current permissions for outputDir: " + MoreFiles.getPosixFilePermissions(outputDir).toString());
     }

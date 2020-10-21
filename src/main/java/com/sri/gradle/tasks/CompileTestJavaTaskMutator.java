@@ -2,7 +2,6 @@ package com.sri.gradle.tasks;
 
 import com.sri.gradle.Constants;
 import com.sri.gradle.utils.JavaProjectHelper;
-import com.sri.gradle.utils.RuntimeClasspath;
 import java.io.File;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -38,7 +37,7 @@ public class CompileTestJavaTaskMutator {
   }
 
   private void configureClasspath(JavaCompile javaCompile) {
-    Set<File> runtimeClasspath = RuntimeClasspath.getFiles(project);
+    Set<File> runtimeClasspath = JavaProjectHelper.getRuntimeClasspath(project);
     javaCompile.setClasspath(project.files(this.compileJavaClasspath, runtimeClasspath));
   }
 

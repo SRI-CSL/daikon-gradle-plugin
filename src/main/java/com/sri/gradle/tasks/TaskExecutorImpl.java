@@ -95,6 +95,7 @@ public class TaskExecutorImpl implements TaskExecutor {
 
     executeDynComp(mainClass, allClassnames, classpath, classesDir, outputDir);
     executeChicory(mainClass, prefix, allClassnames, classpath, classesDir, outputDir);
+
     executeDaikon(mainClass, prefix, classpath, classesDir, outputDir);
   }
 
@@ -104,14 +105,15 @@ public class TaskExecutorImpl implements TaskExecutor {
       List<File> classpath,
       Path testClassDir,
       Path outputDir) {
+
+    final File invariantFile = outputDir.resolve(namePrefix + ".inv.gz").toFile();
+
     final Program daikon =
         new Daikon()
             .setClasspath(classpath)
-            .setWorkingDirectory(testClassDir)
-            .setMainClass(mainClass)
+            .setWorkingDirectory(outputDir)
             .setDtraceFile(outputDir, namePrefix + ".dtrace.gz")
-            .setStandardOutput(
-                outputDir.resolve(namePrefix + ".inv.gz").toFile().getAbsolutePath());
+            .setStandardOutput(invariantFile.getAbsolutePath());
 
     daikon.execute();
   }

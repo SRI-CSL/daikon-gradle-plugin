@@ -1,9 +1,11 @@
 package com.sri.gradle.utils;
 
+import com.google.common.collect.ImmutableSet;
 import com.sri.gradle.Constants;
 import java.io.File;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Set;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.file.Directory;
@@ -15,6 +17,13 @@ import org.gradle.api.tasks.SourceSetContainer;
 public class JavaProjectHelper {
   private JavaProjectHelper() {
     throw new Error("Cannot be instantiated");
+  }
+
+  public static Set<File> getRuntimeClasspath(Project project) {
+    // HACK. needed the test's runtime classpath to compile the test driver.
+    // This classpath is different than the one the Daikon tool needs.
+    // TODO(has) to find a better way to get this classpath.
+    return ImmutableSet.copyOf(getSourceSet("test", project).getRuntimeClasspath().getFiles());
   }
 
   public static <T> T extension(Project project, Class<T> extensionType) {
