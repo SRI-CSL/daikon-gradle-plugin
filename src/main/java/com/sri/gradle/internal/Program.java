@@ -57,9 +57,8 @@ public interface Program {
     return this;
   }
 
-  default Program setDtraceFile(Path directory, String filename) {
-    final Path resolved = directory.resolve(filename);
-    args(String.format("%s", resolved));
+  default Program setDtraceFile(String filename) {
+    args(String.format("%s", filename));
     return this;
   }
 

@@ -96,24 +96,20 @@ public class TaskExecutorImpl implements TaskExecutor {
     executeDynComp(mainClass, allClassnames, classpath, classesDir, outputDir);
     executeChicory(mainClass, prefix, allClassnames, classpath, classesDir, outputDir);
 
-    executeDaikon(mainClass, prefix, classpath, classesDir, outputDir);
+    executeDaikon(prefix, classpath, outputDir);
   }
 
   private static void executeDaikon(
-      String mainClass,
       String namePrefix,
       List<File> classpath,
-      Path testClassDir,
       Path outputDir) {
-
-    final File invariantFile = outputDir.resolve(namePrefix + ".inv.gz").toFile();
 
     final Program daikon =
         new Daikon()
             .setClasspath(classpath)
             .setWorkingDirectory(outputDir)
-            .setDtraceFile(outputDir, namePrefix + ".dtrace.gz")
-            .setStandardOutput(invariantFile.getAbsolutePath());
+            .setDtraceFile(namePrefix + ".dtrace.gz")
+            .setStandardOutput(namePrefix + ".inv.gz");
 
     daikon.execute();
   }
@@ -131,8 +127,6 @@ public class TaskExecutorImpl implements TaskExecutor {
             .setWorkingDirectory(outputDir)
             .setMainClass(mainClass)
             .setSelectedClasses(allQualifiedClasses)
-            // TODO(has) seems that workingDirectory is affecting the output setting behavior.
-            //        .setOutputDirectory(outputDir)
             .setComparabilityFile(outputDir, namePrefix + ".decls-DynComp");
 
     chicory.execute();
