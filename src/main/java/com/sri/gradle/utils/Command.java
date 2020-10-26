@@ -92,9 +92,8 @@ public class Command {
     final ProcessBuilder processBuilder =
         new ProcessBuilder().command(args).redirectErrorStream(true);
 
-    if (workingDirectory != null) {
-      processBuilder.directory(workingDirectory);
-    }
+    // makes sure we set a non-null working directory
+    processBuilder.directory(Objects.requireNonNull(workingDirectory));
 
     processBuilder.environment().putAll(environment);
 

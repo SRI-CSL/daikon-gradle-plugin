@@ -28,7 +28,9 @@ public class DaikonPluginTest {
   }
 
   @Test public void testCommandBuilder() {
-    List<String> echoResult = Command.create().arguments("echo", "hello")
+    List<String> echoResult = Command.create()
+        .workingDirectory(Constants.USER_WORKING_DIR)
+        .arguments("echo", "hello")
         .permitNonZeroExitStatus().execute();
 
     assertThat(echoResult.size(), is(1));
