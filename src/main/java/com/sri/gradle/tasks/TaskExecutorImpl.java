@@ -107,10 +107,10 @@ public class TaskExecutorImpl implements TaskExecutor {
 
     final Program daikon =
         new Daikon()
-            .setClasspath(classpath)
-            .setWorkingDirectory(outputDir)
             .setDtraceFile(namePrefix + ".dtrace.gz")
-            .setStandardOutput(namePrefix + ".inv.gz");
+            .setStandardOutput(namePrefix + ".inv.gz")
+            .setClasspath(classpath)
+            .setWorkingDirectory(outputDir);
 
     daikon.execute();
   }
@@ -121,13 +121,14 @@ public class TaskExecutorImpl implements TaskExecutor {
       List<String> allQualifiedClasses,
       List<File> classpath,
       Path outputDir) {
+
     final Program chicory =
         new Chicory()
+            .setComparabilityFile(outputDir, namePrefix + ".decls-DynComp")
             .setClasspath(classpath)
             .setWorkingDirectory(outputDir)
             .setMainClass(mainClass)
-            .setSelectedClasses(allQualifiedClasses)
-            .setComparabilityFile(outputDir, namePrefix + ".decls-DynComp");
+            .setSelectedClasses(allQualifiedClasses);
 
     chicory.execute();
   }
@@ -138,13 +139,14 @@ public class TaskExecutorImpl implements TaskExecutor {
       List<File> classpath,
       Path testClassDir,
       Path outputDir) {
+
     final Program dynComp =
         new DynComp()
+            .setOutputDirectory(outputDir)
             .setClasspath(classpath)
             .setWorkingDirectory(testClassDir)
             .setMainClass(mainClass)
-            .setSelectedClasses(allQualifiedClasses)
-            .setOutputDirectory(outputDir);
+            .setSelectedClasses(allQualifiedClasses);
 
     dynComp.execute();
   }

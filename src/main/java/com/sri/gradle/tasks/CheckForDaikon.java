@@ -13,7 +13,7 @@ public class CheckForDaikon extends AbstractNamedTask {
     try {
       final File daikonJar = getJarfile(Constants.DAIKON_JAR_FILE);
 
-      new Daikon().addToolJarToClasspath(daikonJar).help().execute();
+      new Daikon().help().addToolJarToClasspath(daikonJar).execute();
 
     } catch (Exception e) {
       throw new GradleException(Constants.UNEXPECTED_ERROR);
