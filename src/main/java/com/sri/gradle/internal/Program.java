@@ -37,11 +37,6 @@ public interface Program {
     return this;
   }
 
-//  default Program setOutputDirectory(Path directory) {
-//    args(String.format("--output_dir=%s", directory));
-//    return this;
-//  }
-
   default Program setDtraceFile(String filename) {
     args(String.format("%s", filename));
     return this;
