@@ -43,10 +43,8 @@ public class Constants {
   public static final String NEW_LINE = System.getProperty("line.separator");
   public static final String FILE_SEPARATOR = System.getProperty("file.separator");
   public static final String PATH_SEPARATOR = System.getProperty("path.separator");
-  public static final String EMPTY_STRING = "";
   public static final String SPACE = " ";
   public static final String DOUBLE_SPACE = SPACE + SPACE;
-  public static final String PERIOD = ".";
 
   // error related constants
   public static final String BAD_DAIKON_ERROR = "Unable to run Daikon.";

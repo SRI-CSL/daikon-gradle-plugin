@@ -95,11 +95,11 @@ public class MoreFiles {
         canonicalPath.substring(0, canonicalPath.indexOf(Constants.PROJECT_TEST_CLASS_DIR));
     deletingPrefix = (deletingPrefix + Constants.PROJECT_TEST_CLASS_DIR) + Constants.FILE_SEPARATOR;
 
-    String trimmedCanonicalPath = canonicalPath.replace(deletingPrefix, Constants.EMPTY_STRING);
+    String trimmedCanonicalPath = canonicalPath.replace(deletingPrefix, "");
     trimmedCanonicalPath =
         trimmedCanonicalPath
-            .replaceAll(".class", Constants.EMPTY_STRING)
-            .replaceAll(Constants.FILE_SEPARATOR, Constants.PERIOD);
+            .replaceAll(".class", "")
+            .replaceAll(Constants.FILE_SEPARATOR, ".");
     return trimmedCanonicalPath;
   }
 }

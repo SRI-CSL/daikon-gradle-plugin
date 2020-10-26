@@ -45,8 +45,8 @@ public class DaikonPlugin implements Plugin<Project> {
     mainTask.setGroup(Constants.GROUP);
     mainTask.setDescription(Constants.PLUGIN_DESCRIPTION);
 
-    mainTask.getOutputDir().set(extension.getOutputDir());
     mainTask.getRequires().set(extension.getRequires());
+    mainTask.getOutputDir().set(extension.getOutputDir());
     mainTask.getTestDriverPackage().set(extension.getTestDriverPackage());
     mainTask.getGenerateTestDriver().set(extension.getGenerateTestDriver());
 

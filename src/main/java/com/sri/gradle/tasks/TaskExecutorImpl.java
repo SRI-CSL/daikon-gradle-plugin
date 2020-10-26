@@ -74,8 +74,8 @@ public class TaskExecutorImpl implements TaskExecutor {
         Filefinder.findJavaClasses(classesDir, "$" /*exclude those that contain this symbol*/);
     final List<String> allClassnames = MoreFiles.getClassNames(allTestClasses);
 
-    // TODO(has) Consider changing this. Some projects may have
-    //  more than one test driver.
+    // TODO(has) Some projects may have more than one test driver. Is there
+    //  a better way to handle the case of multiple test drivers?
     String mainClass =
         allClassnames
             .stream()
@@ -89,13 +89,14 @@ public class TaskExecutorImpl implements TaskExecutor {
       return;
     }
 
-    mainClass = mainClass.replace(".class", Constants.EMPTY_STRING);
+    mainClass = mainClass.endsWith(".class")
+        ? mainClass.replace(".class", "")
+        : mainClass;
 
     final String prefix = mainClass.substring(mainClass.lastIndexOf('.') + 1);
 
     executeDynComp(mainClass, allClassnames, classpath, classesDir, outputDir);
-    executeChicory(mainClass, prefix, allClassnames, classpath, classesDir, outputDir);
-
+    executeChicory(mainClass, prefix, allClassnames, classpath, outputDir);
     executeDaikon(prefix, classpath, outputDir);
   }
 
@@ -119,7 +120,6 @@ public class TaskExecutorImpl implements TaskExecutor {
       String namePrefix,
       List<String> allQualifiedClasses,
       List<File> classpath,
-      Path testClassDir,
       Path outputDir) {
     final Program chicory =
         new Chicory()
