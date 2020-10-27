@@ -5,36 +5,23 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 
-import com.sri.gradle.utils.Command;
 import com.sri.gradle.utils.Filefinder;
+import com.sri.gradle.utils.ImmutableStream;
 import com.sri.gradle.utils.MoreFiles;
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import org.junit.Test;
 
 public class DaikonPluginTest {
-  @Test public void testJavafinder() {
+  @Test public void testJavafinder() throws Exception {
     Path dir = new File("src/main/java/com/sri/gradle/utils").toPath();
     System.out.println(dir);
     List<File> filesAvailable = Filefinder.findJavaFiles(dir);
+    List<Path> filesExpected = ImmutableStream.listCopyOf(Files.list(dir));
 
-    final List<String> output = Command.create()
-        .workingDirectory(dir.toFile())
-        .arguments("ls")
-        .execute();
-
-    assertThat(filesAvailable.size(), is(output.size()));
-  }
-
-  @Test public void testCommandBuilder() {
-    List<String> echoResult = Command.create()
-        .workingDirectory(Constants.USER_WORKING_DIR)
-        .arguments("echo", "hello")
-        .permitNonZeroExitStatus().execute();
-
-    assertThat(echoResult.size(), is(1));
-    assertEquals(echoResult.get(0), "hello");
+    assertThat(filesAvailable.size(), is(filesExpected.size()));
   }
 
   @Test public void testFQNExtractor() {
