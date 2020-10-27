@@ -52,14 +52,14 @@ public class Command {
       final String string = toString();
       if (string.length() > builder.maxCommandLength) {
         throw new IllegalStateException(
-            "Maximum command length " +
-                builder.maxCommandLength + " exceeded by: " + string);
+            "Maximum command length " + builder.maxCommandLength + " exceeded by: " + string);
       }
     }
   }
 
   /**
    * Creates a Command.Builder object
+   *
    * @return self to facilitate method chaining
    */
   public static Builder create() {
@@ -89,12 +89,11 @@ public class Command {
 
     println(stdout, ("executing " + this));
 
-    final ProcessBuilder processBuilder = new ProcessBuilder().command(args)
-        .redirectErrorStream(true);
+    final ProcessBuilder processBuilder =
+        new ProcessBuilder().command(args).redirectErrorStream(true);
 
-    if (workingDirectory != null) {
-      processBuilder.directory(workingDirectory);
-    }
+    // makes sure we set a non-null working directory
+    processBuilder.directory(Objects.requireNonNull(workingDirectory));
 
     processBuilder.environment().putAll(environment);
 
@@ -103,16 +102,12 @@ public class Command {
     process = processBuilder.start();
   }
 
-  /**
-   * @return true if the process has started; false otherwise.
-   */
+  /** @return true if the process has started; false otherwise. */
   public boolean isStarted() {
     return process != null;
   }
 
-  /**
-   * @return the current input stream used by running process.
-   */
+  /** @return the current input stream used by running process. */
   public InputStream getInputStream() {
     if (!isStarted()) {
       throw new IllegalStateException("Not started!");
@@ -122,11 +117,11 @@ public class Command {
   }
 
   /**
-   * Reads from standard input and writes to standard output.
-   * Once the process completes, the command's output is returned.
+   * Reads from standard input and writes to standard output. Once the process completes, the
+   * command's output is returned.
    *
    * @return the output on terminal.
-   * @throws IOException          unexpected behavior occurred.
+   * @throws IOException unexpected behavior occurred.
    * @throws InterruptedException unexpected behavior occurred.
    */
   public List<String> gatherOutput() throws IOException, InterruptedException {
@@ -134,8 +129,8 @@ public class Command {
       throw new IllegalStateException("Not started!");
     }
 
-    try (BufferedReader bufferedReader = new BufferedReader(
-        new InputStreamReader(getInputStream(), StandardCharsets.UTF_8))) {
+    try (BufferedReader bufferedReader =
+        new BufferedReader(new InputStreamReader(getInputStream(), StandardCharsets.UTF_8))) {
       final List<String> outputLines = new ArrayList<>();
 
       String outputLine;
@@ -152,13 +147,10 @@ public class Command {
       }
 
       return outputLines;
-
     }
   }
 
-  /**
-   * @return the output displayed on the terminal.
-   */
+  /** @return the output displayed on the terminal. */
   public List<String> execute() {
     try {
       start();
@@ -175,7 +167,7 @@ public class Command {
   @Override
   public String toString() {
 
-    MoreObjects.ToStringHelper toString =  MoreObjects.toStringHelper(this);
+    MoreObjects.ToStringHelper toString = MoreObjects.toStringHelper(this);
     for (String eachKey : environment.keySet()) {
       toString = toString.add(eachKey, environment.get(eachKey));
     }
@@ -185,20 +177,18 @@ public class Command {
     }
 
     return toString.toString();
-
   }
 
-
   /**
-   * Implements a generic method for joining a collection of objects. This
-   * method is intended to work on Java6+ versions.
+   * Implements a generic method for joining a collection of objects. This method is intended to
+   * work on Java6+ versions.
    *
    * @param delimiter delimiter between entries in a collection.
    * @param data collection to join using a given delimiter.
    * @param <T> element type
    * @return joined collection represented as a String
    */
-  public static <T> String joinCollection(String delimiter, Collection<T> data){
+  public static <T> String joinCollection(String delimiter, Collection<T> data) {
     final Iterator<T> iterator = data.iterator();
     final StringBuilder stringBuilder = new StringBuilder();
 
@@ -219,9 +209,7 @@ public class Command {
     }
   }
 
-  /**
-   * Command builder
-   */
+  /** Command builder */
   public static class Builder {
 
     private PrintStream stdout;
@@ -233,9 +221,7 @@ public class Command {
     private boolean permitNonZeroExitStatus;
     private int maxCommandLength;
 
-    /**
-     * Creates a command builder.
-     */
+    /** Creates a command builder. */
     Builder() {
       this.stdout = null;
       this.stderr = null;
@@ -277,7 +263,7 @@ public class Command {
     /**
      * Sets an environment's variable.
      *
-     * @param key   key identifying the variable
+     * @param key key identifying the variable
      * @param value the value of the variable
      * @return self
      */
@@ -287,8 +273,8 @@ public class Command {
     }
 
     /**
-     * Sets the standard streams (out and error) to which the Command
-     * writes its output and its error output.
+     * Sets the standard streams (out and error) to which the Command writes its output and its
+     * error output.
      *
      * @param stdout the standard output
      * @param stderr the standard error
@@ -332,9 +318,7 @@ public class Command {
       return this;
     }
 
-    /**
-     * @return the built command.
-     */
+    /** @return the built command. */
     public Command build() {
       return new Command(this);
     }
@@ -348,26 +332,21 @@ public class Command {
       return build().execute();
     }
 
-
     @Override
     public String toString() {
       final String left = this.args.toString();
-      String right = Optional.ofNullable(workingDirectory)
-          .map(File::toString)
-          .orElse("");
+      String right = Optional.ofNullable(workingDirectory).map(File::toString).orElse("");
       return left + " : " + right;
     }
   }
 
-  /**
-   * Command failed to execute exception.
-   */
+  /** Command failed to execute exception. */
   private static class CommandFailedException extends RuntimeException {
 
     /**
      * Construct a new CommandFailedException object.
      *
-     * @param args        list of command's args.
+     * @param args list of command's args.
      * @param outputLines list of output lines displayed on terminal.
      */
     CommandFailedException(List<String> args, List<String> outputLines) {
@@ -386,7 +365,7 @@ public class Command {
     /**
      * Turns a list of args and output lines into a formatted message.
      *
-     * @param args        list of command's args.
+     * @param args list of command's args.
      * @param outputLines list of output lines displayed on terminal.
      * @return formatted message.
      */
@@ -399,9 +378,7 @@ public class Command {
       }
 
       for (String outputLine : outputLines) {
-        result.append(System.lineSeparator())
-            .append("  ")
-            .append(outputLine);
+        result.append(System.lineSeparator()).append("  ").append(outputLine);
       }
 
       return result.toString();

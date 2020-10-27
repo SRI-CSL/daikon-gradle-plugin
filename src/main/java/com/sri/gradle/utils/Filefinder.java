@@ -18,11 +18,12 @@ import java.util.List;
 import java.util.Set;
 
 public class Filefinder {
-  private Filefinder() {}
+  private Filefinder() {
+    throw new Error("Cannot be instantiated");
+  }
 
   /**
-   * List all Java files found in a directory. Skip those ones matching
-   * the provide skip hints.
+   * List all Java files found in a directory. Skip those ones matching the provide skip hints.
    *
    * @param directory directory to access
    * @param exclude hints for files to be excluded in the directory.
@@ -35,8 +36,7 @@ public class Filefinder {
   }
 
   /**
-   * List all Java classes found in a directory. Skip those ones matching
-   * the provide skip hints.
+   * List all Java classes found in a directory. Skip those ones matching the provide skip hints.
    *
    * @param directory directory to access
    * @param exclude hints for files to be excluded in the directory.
@@ -49,8 +49,8 @@ public class Filefinder {
   }
 
   /**
-   * List all jar files found in a directory. Skip those ones matching
-   * the provide skip hints. Avoids using classloaders.
+   * List all jar files found in a directory. Skip those ones matching the provide skip hints.
+   * Avoids using classloaders.
    *
    * @param directory directory to access
    * @param exclude hints for files to be excluded in the directory.
@@ -63,8 +63,7 @@ public class Filefinder {
   }
 
   /**
-   * List all Java files found in a directory.
-   * Skip those ones matching the provide skip hints.
+   * List all Java files found in a directory. Skip those ones matching the provide skip hints.
    *
    * @param directory directory to access
    * @param matcher file matching strategy
@@ -74,9 +73,7 @@ public class Filefinder {
   private static List<File> findFiles(File directory, final Dot matcher, String... skipHints) {
 
     try {
-      return ImmutableList.copyOf(
-          walkDirectory(directory, matcher, skipHints)
-      );
+      return ImmutableList.copyOf(walkDirectory(directory, matcher, skipHints));
     } catch (IOException e) {
       System.err.printf("Error: unable to crawl %s. See %s%n", directory.getName(), e);
     }
@@ -84,47 +81,50 @@ public class Filefinder {
     return ImmutableList.of();
   }
 
-
   /**
-   * Crawls a directory structure in search of files matching an file extension. At
-   * the same time it will skip those files that contains certain keywords.
+   * Crawls a directory structure in search of files matching an file extension. At the same time it
+   * will skip those files that contains certain keywords.
    *
    * @param location the directory location
    * @param keywords skip hints
    * @return a list of interesting files
    * @throws IOException unexpected error has occurred.
    */
-  private static List<File> walkDirectory(final File location, final Dot matcher, final String... keywords) throws IOException {
+  private static List<File> walkDirectory(
+      final File location, final Dot matcher, final String... keywords) throws IOException {
 
     final Path start = Paths.get(location.toURI());
 
-    final List<File>  files   = new ArrayList<>();
+    final List<File> files = new ArrayList<>();
     final Set<String> excluded = ImmutableSet.copyOf(Arrays.asList(keywords));
 
     try {
-      Files.walkFileTree(start, new SimpleFileVisitor<Path>() {
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+      Files.walkFileTree(
+          start,
+          new SimpleFileVisitor<Path>() {
+            @Override
+            public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
+                throws IOException {
 
-          final Path fileName = file.getFileName();
+              final Path fileName = file.getFileName();
 
-          if (matcher.matches(fileName)) {
-            final File visitedFile = file.toFile();
-            final String name = visitedFile.getName().replace(("." + matcher.getExt()), "");
+              if (matcher.matches(fileName)) {
+                final File visitedFile = file.toFile();
+                final String name = visitedFile.getName().replace(("." + matcher.getExt()), "");
 
-            if (!isExcluded(name, excluded)) {
-              files.add(visitedFile);
+                if (!isExcluded(name, excluded)) {
+                  files.add(visitedFile);
+                }
+              }
+
+              return FileVisitResult.CONTINUE;
             }
-          }
+          });
 
-          return FileVisitResult.CONTINUE;
-        }
-      });
-
-    } catch (IOException ignored) { }
+    } catch (IOException ignored) {
+    }
 
     return files;
-
   }
 
   private static boolean isExcluded(String name, Set<String> excludedSet) {
@@ -160,5 +160,4 @@ public class Filefinder {
       return ext;
     }
   }
-
 }

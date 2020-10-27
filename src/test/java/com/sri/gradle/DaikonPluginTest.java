@@ -18,11 +18,19 @@ public class DaikonPluginTest {
     Path dir = new File("src/main/java/com/sri/gradle/utils").toPath();
     System.out.println(dir);
     List<File> filesAvailable = Filefinder.findJavaFiles(dir);
-    assertThat(filesAvailable.size(), is(7));
+
+    final List<String> output = Command.create()
+        .workingDirectory(dir.toFile())
+        .arguments("ls")
+        .execute();
+
+    assertThat(filesAvailable.size(), is(output.size()));
   }
 
   @Test public void testCommandBuilder() {
-    List<String> echoResult = Command.create().arguments("echo", "hello")
+    List<String> echoResult = Command.create()
+        .workingDirectory(Constants.USER_WORKING_DIR)
+        .arguments("echo", "hello")
         .permitNonZeroExitStatus().execute();
 
     assertThat(echoResult.size(), is(1));

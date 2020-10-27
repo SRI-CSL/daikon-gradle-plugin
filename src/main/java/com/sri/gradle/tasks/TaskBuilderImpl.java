@@ -1,7 +1,7 @@
 package com.sri.gradle.tasks;
 
 import com.google.common.base.Predicates;
-import com.sri.gradle.utils.RuntimeClasspath;
+import com.sri.gradle.utils.JavaProjectHelper;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -21,23 +21,29 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
 
   private final List<File> classpath;
 
-  public TaskBuilderImpl(InputProvider provider, TaskExecutorImpl executor){
+  public TaskBuilderImpl(InputProvider provider, TaskExecutorImpl executor) {
     // TODO(has) consider re-designing InputProvider's API. Fetching
     //  its members should be simpler than this.
-    final File testClassesDir = Arrays.stream(provider.get())
-        .filter(Predicates.instanceOf(File.class))
-        .map(o -> (File) o).findFirst()
-        .orElse(null);
+    final File testClassesDir =
+        Arrays.stream(provider.get())
+            .filter(Predicates.instanceOf(File.class))
+            .map(o -> (File) o)
+            .findFirst()
+            .orElse(null);
 
-    final String testDriverPackage = Arrays.stream(provider.get())
-        .filter(Predicates.instanceOf(String.class))
-        .map(Object::toString).findFirst()
-        .orElse(null);
+    final String testDriverPackage =
+        Arrays.stream(provider.get())
+            .filter(Predicates.instanceOf(String.class))
+            .map(Object::toString)
+            .findFirst()
+            .orElse(null);
 
-    final Project gradleProject = Arrays.stream(provider.get())
-        .filter(Predicates.instanceOf(Project.class))
-        .map(o -> (Project)o).findFirst()
-        .orElse(null);
+    final Project gradleProject =
+        Arrays.stream(provider.get())
+            .filter(Predicates.instanceOf(Project.class))
+            .map(o -> (Project) o)
+            .findFirst()
+            .orElse(null);
 
     this.executor = executor;
     this.testClassesDir = testClassesDir;
@@ -47,11 +53,11 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
     this.gradleProject = gradleProject;
   }
 
-  public List<File> getClasspath(){
+  public List<File> getClasspath() {
     return classpath;
   }
 
-  public Project getGradleProject(){
+  public Project getGradleProject() {
     return gradleProject;
   }
 
@@ -59,11 +65,11 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
     return outputDir;
   }
 
-  public File getTestClassesDir(){
+  public File getTestClassesDir() {
     return testClassesDir;
   }
 
-  public String getTestDriverPackage(){
+  public String getTestDriverPackage() {
     return testDriverPackage;
   }
 
@@ -106,7 +112,7 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
       classpath.add(each);
     }
 
-    classpath.addAll(RuntimeClasspath.getFiles(getGradleProject()));
+    classpath.addAll(JavaProjectHelper.getRuntimeClasspath(getGradleProject()));
 
     return this;
   }

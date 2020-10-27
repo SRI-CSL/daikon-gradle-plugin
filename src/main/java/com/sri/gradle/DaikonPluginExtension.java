@@ -12,7 +12,6 @@ public class DaikonPluginExtension {
   private final Property<String> testDriverPackage;
   private final Property<Boolean> generateTestDriver;
 
-
   public DaikonPluginExtension(Project project) {
     this.outputDir = project.getObjects().directoryProperty();
     this.requires = project.getObjects().directoryProperty();
@@ -32,8 +31,7 @@ public class DaikonPluginExtension {
     return testDriverPackage;
   }
 
-  public Property<Boolean> getGenerateTestDriver(){
+  public Property<Boolean> getGenerateTestDriver() {
     return generateTestDriver;
   }
-
 }
