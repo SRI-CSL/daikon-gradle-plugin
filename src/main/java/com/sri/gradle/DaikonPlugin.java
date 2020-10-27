@@ -70,9 +70,10 @@ public class DaikonPlugin implements Plugin<Project> {
 
     genCodeTask.getTestDriverPackage().set(extension.getTestDriverPackage());
 
+    final JavaProjectHelper projectHelper = new JavaProjectHelper(project);
+
     Optional<JavaCompile> javaCompile =
-        JavaProjectHelper.findTask(
-            project, JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME, JavaCompile.class);
+        projectHelper.findTask(JavaPlugin.COMPILE_TEST_JAVA_TASK_NAME, JavaCompile.class);
     if (!javaCompile.isPresent()) {
       throw new GradleException("JavaPlugin is available in this project");
     }
@@ -93,7 +94,7 @@ public class DaikonPlugin implements Plugin<Project> {
                 + (driverExtension.getCompileTestDriverSeparately() ? "enabled." : "disabled."));
 
     final JavaCompile testDriverJavaCompile =
-        JavaProjectHelper.task(project, Constants.COMPILE_TEST_DRIVER, JavaCompile.class);
+        projectHelper.task(Constants.COMPILE_TEST_DRIVER, JavaCompile.class);
     testDriverJavaCompile.dependsOn(genCodeTask);
     final CompileTestJavaTaskMutator compileMutator =
         new CompileTestJavaTaskMutator(project, aJavaCompile.getClasspath());
