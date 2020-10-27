@@ -1,6 +1,5 @@
 package com.sri.gradle.tasks;
 
-import com.sri.gradle.internal.JavaProgram;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -8,7 +7,7 @@ import java.util.List;
 public interface TaskBuilder {
   // TODO(has) add more Daikon's options
   /**
-   * Builds the classpath the {@link JavaProgram java tools} need for their execution. Client code
+   * Builds the classpath needed to run the Daikon tools. Client code
    * can update this classpath, if needed.
    *
    * <p>Note: this method assumes that the working directory is the same as the output directory set
