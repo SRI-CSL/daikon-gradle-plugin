@@ -53,10 +53,11 @@ public class CompileTestJavaTaskMutator {
             .getProject()
             .getObjects()
             .sourceDirectorySet("driver", "driver")
-            .srcDir(JavaProjectHelper.getDriverDir(javaCompile.getProject()));
+            .srcDir(getProjectHelper().getDriverDir());
+
     final SourceSet sourceSet = getProjectHelper().getTestSourceSet();
     final Set<File> newSourceSet = new HashSet<>(sourceSet.getJava().getSrcDirs());
-    newSourceSet.add(JavaProjectHelper.getDriverDir(javaCompile.getProject()));
+    newSourceSet.add(getProjectHelper().getDriverDir());
     newSourceSet
         .stream()
         .map(srcDir -> srcDir.toPath().resolve(Constants.TEST_DRIVER_CLASSNAME + ".java"))

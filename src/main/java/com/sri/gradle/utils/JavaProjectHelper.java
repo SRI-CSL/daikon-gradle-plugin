@@ -80,6 +80,11 @@ public class JavaProjectHelper {
     return project.getLayout().getBuildDirectory();
   }
 
+
+  public Directory getBuildMainDir() {
+    return getBuildDir().dir(Constants.PROJECT_MAIN_CLASS_DIR).get();
+  }
+
   public static Directory getBuildMainDir(DirectoryProperty buildDir) {
     return buildDir.dir(Constants.PROJECT_MAIN_CLASS_DIR).get();
   }
@@ -122,6 +127,10 @@ public class JavaProjectHelper {
 
     final String testpath = testDriverPackage.get().replaceAll("\\.", Constants.FILE_SEPARATOR);
     return outputDir.dir(testpath);
+  }
+
+  public File getDriverDir() {
+    return new File(getProject().getBuildDir(), "driver");
   }
 
   public static File getDriverDir(Project project) {
