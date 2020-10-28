@@ -44,6 +44,11 @@ public interface TaskExecutor {
   void execute() throws TaskConfigurationError;
 
   class TaskConfigurationError extends RuntimeException {
+
+    TaskConfigurationError(String message){
+      super(message);
+    }
+
     TaskConfigurationError(Collection<Throwable> throwables) {
       super(buildErrorMessage(throwables));
     }

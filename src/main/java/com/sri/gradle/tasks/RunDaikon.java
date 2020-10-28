@@ -39,11 +39,10 @@ public class RunDaikon extends AbstractNamedTask {
   @TaskAction
   public void daikonRun() {
     final TaskExecutorImpl executor = new TaskExecutorImpl();
+    final JavaProjectHelper projectHelper = new JavaProjectHelper(getProject());
 
-    final DirectoryProperty buildDir = JavaProjectHelper.getBuildDir(getProject());
-
-    final Directory buildMainDir = JavaProjectHelper.getBuildMainDir(buildDir);
-    final Directory buildTestDir = JavaProjectHelper.getBuildTestDir(buildDir);
+    final Directory buildMainDir = projectHelper.getBuildMainDir();
+    final Directory buildTestDir = projectHelper.getBuildTestDir();
     final Directory testClassesDir =
         JavaProjectHelper.getTestClassesDir(getTestDriverPackage(), buildTestDir);
 

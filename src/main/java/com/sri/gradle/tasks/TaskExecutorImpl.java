@@ -2,10 +2,7 @@ package com.sri.gradle.tasks;
 
 import com.google.common.base.Preconditions;
 import com.sri.gradle.Constants;
-import com.sri.gradle.internal.Chicory;
-import com.sri.gradle.internal.Daikon;
-import com.sri.gradle.internal.DynComp;
-import com.sri.gradle.internal.Program;
+import com.sri.gradle.internal.MainExecutor;
 import com.sri.gradle.utils.Filefinder;
 import com.sri.gradle.utils.MoreFiles;
 import java.io.File;
@@ -33,8 +30,9 @@ public class TaskExecutorImpl implements TaskExecutor {
 
   @Override
   public TaskBuilder runDaikonOn(InputProvider provider) {
-    Preconditions.checkArgument(provider != null);
-    Preconditions.checkArgument(provider.size() == 2 || provider.size() == 3);
+    Preconditions.checkArgument(
+        provider != null
+            && (provider.size() == 2 || provider.size() == 3));
 
     final TaskBuilderImpl builder = new TaskBuilderImpl(provider, this);
     workBuilders.add(builder);
@@ -85,8 +83,8 @@ public class TaskExecutorImpl implements TaskExecutor {
             .orElse(null);
 
     if (mainClass == null) {
-      each.getGradleProject().getLogger().debug("Not main class for DynComp operation");
-      return;
+      throw new TaskConfigurationError(
+          "DynComp/Chicory operations require a non-null main class.");
     }
 
     mainClass = mainClass.endsWith(".class")
@@ -95,59 +93,34 @@ public class TaskExecutorImpl implements TaskExecutor {
 
     final String prefix = mainClass.substring(mainClass.lastIndexOf('.') + 1);
 
-    executeDynComp(mainClass, allClassnames, classpath, classesDir, outputDir);
-    executeChicory(mainClass, prefix, allClassnames, classpath, outputDir);
-    executeDaikon(prefix, classpath, outputDir);
+    // Use Gradle's Executor and ExecSpec pattern. This the replacement
+    // for the Command object and its built Java programs; e.g., Daikon, Chicory, DynComp
+    final MainExecutor mainExecutor = new MainExecutor(each.getGradleProject());
+
+    // DynComp
+    mainExecutor.execDynComp(
+        classpath,
+        allClassnames,
+        mainClass,
+        classesDir,
+        outputDir
+    );
+
+    // Chicory
+    mainExecutor.execChicory(
+        classpath,
+        allClassnames,
+        mainClass,
+        prefix,
+        outputDir
+    );
+
+    // Daikon
+    mainExecutor.execDaikon(
+        prefix,
+        classpath,
+        outputDir
+    );
   }
 
-  private static void executeDaikon(
-      String namePrefix,
-      List<File> classpath,
-      Path outputDir) {
-
-    final Program daikon =
-        new Daikon()
-            .setDtraceFile(namePrefix + ".dtrace.gz")
-            .setStandardOutput(namePrefix + ".inv.gz")
-            .setClasspath(classpath)
-            .setWorkingDirectory(outputDir);
-
-    daikon.execute();
-  }
-
-  private static void executeChicory(
-      String mainClass,
-      String namePrefix,
-      List<String> allQualifiedClasses,
-      List<File> classpath,
-      Path outputDir) {
-
-    final Program chicory =
-        new Chicory()
-            .setComparabilityFile(outputDir, namePrefix + ".decls-DynComp")
-            .setClasspath(classpath)
-            .setWorkingDirectory(outputDir)
-            .setMainClass(mainClass)
-            .setSelectedClasses(allQualifiedClasses);
-
-    chicory.execute();
-  }
-
-  private static void executeDynComp(
-      String mainClass,
-      List<String> allQualifiedClasses,
-      List<File> classpath,
-      Path testClassDir,
-      Path outputDir) {
-
-    final Program dynComp =
-        new DynComp()
-            .setOutputDirectory(outputDir)
-            .setClasspath(classpath)
-            .setWorkingDirectory(testClassDir)
-            .setMainClass(mainClass)
-            .setSelectedClasses(allQualifiedClasses);
-
-    dynComp.execute();
-  }
 }

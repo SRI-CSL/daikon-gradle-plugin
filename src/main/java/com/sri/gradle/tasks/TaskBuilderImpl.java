@@ -17,13 +17,12 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
   private final File testClassesDir;
   private Path outputDir;
   private final String testDriverPackage;
-  private final Project gradleProject;
+
+  private final JavaProjectHelper projectHelper;
 
   private final List<File> classpath;
 
   public TaskBuilderImpl(InputProvider provider, TaskExecutorImpl executor) {
-    // TODO(has) consider re-designing InputProvider's API. Fetching
-    //  its members should be simpler than this.
     final File testClassesDir =
         Arrays.stream(provider.get())
             .filter(Predicates.instanceOf(File.class))
@@ -31,6 +30,7 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
             .findFirst()
             .orElse(null);
 
+    // TODO(has) consider removing this testDriverPackage from the TaskBuilder
     final String testDriverPackage =
         Arrays.stream(provider.get())
             .filter(Predicates.instanceOf(String.class))
@@ -49,8 +49,9 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
     this.testClassesDir = testClassesDir;
     this.outputDir = null;
     this.classpath = new LinkedList<>();
+    // TODO(has) consider removing this
     this.testDriverPackage = testDriverPackage;
-    this.gradleProject = gradleProject;
+    this.projectHelper = new JavaProjectHelper(gradleProject);
   }
 
   public List<File> getClasspath() {
@@ -58,7 +59,11 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
   }
 
   public Project getGradleProject() {
-    return gradleProject;
+    return getProjectHelper().getProject();
+  }
+
+  public JavaProjectHelper getProjectHelper(){
+    return projectHelper;
   }
 
   public Path getOutputDir() {
@@ -112,7 +117,7 @@ public class TaskBuilderImpl implements TaskBuilder, OutputBuilder {
       classpath.add(each);
     }
 
-    classpath.addAll(JavaProjectHelper.getRuntimeClasspath(getGradleProject()));
+    classpath.addAll(getProjectHelper().getRuntimeClasspath());
 
     return this;
   }

@@ -15,15 +15,18 @@ import org.gradle.api.tasks.SourceSet;
 import org.gradle.api.tasks.SourceSetContainer;
 
 public class JavaProjectHelper {
-  private JavaProjectHelper() {
-    throw new Error("Cannot be instantiated");
+  private final Project project;
+
+  public JavaProjectHelper(Project project){
+    this.project = project;
   }
 
-  public static Set<File> getRuntimeClasspath(Project project) {
-    // HACK. needed the test's runtime classpath to compile the test driver.
-    // This classpath is different than the one the Daikon tool needs.
-    // TODO(has) to find a better way to get this classpath.
-    return ImmutableSet.copyOf(getSourceSet("test", project).getRuntimeClasspath().getFiles());
+  public Project getProject(){
+    return project;
+  }
+
+  public Set<File> getRuntimeClasspath(){
+    return ImmutableSet.copyOf(getSourceSet("test", getProject()).getRuntimeClasspath().getFiles());
   }
 
   public static <T> T extension(Project project, Class<T> extensionType) {
@@ -42,12 +45,12 @@ public class JavaProjectHelper {
     return sourceSets(project).getByName(sourceSetName);
   }
 
-  public static SourceSet mainSourceSet(Project project) {
-    return sourceSet(project, SourceSet.MAIN_SOURCE_SET_NAME);
+  public SourceSet getMainSourceSet() {
+    return sourceSet(getProject(), SourceSet.MAIN_SOURCE_SET_NAME);
   }
 
-  public static SourceSet testSourceSet(Project project) {
-    return sourceSet(project, SourceSet.TEST_SOURCE_SET_NAME);
+  public SourceSet getTestSourceSet() {
+    return sourceSet(getProject(), SourceSet.TEST_SOURCE_SET_NAME);
   }
 
   public static Task task(Project project, String taskName) {
@@ -58,13 +61,18 @@ public class JavaProjectHelper {
     return Optional.ofNullable(project.getTasks().findByName(taskName));
   }
 
-  public static <T extends Task> T task(Project project, String taskName, Class<T> taskType) {
-    return taskType.cast(task(project, taskName));
+  public <T extends Task> T task(String taskName, Class<T> taskType) {
+    return taskType.cast(task(getProject(), taskName));
   }
 
-  public static <T extends Task> Optional<T> findTask(
-      Project project, String taskName, Class<T> taskType) {
-    return findTask(project, taskName).map(taskType::cast);
+  public <T extends Task> Optional<T> findTask(
+      String taskName, Class<T> taskType) {
+    return findTask(getProject(), taskName).map(taskType::cast);
+  }
+
+  public DirectoryProperty getBuildDir(){
+    Objects.requireNonNull(getProject());
+    return getProject().getLayout().getBuildDirectory();
   }
 
   public static DirectoryProperty getBuildDir(Project project) {
@@ -72,9 +80,19 @@ public class JavaProjectHelper {
     return project.getLayout().getBuildDirectory();
   }
 
+
+  public Directory getBuildMainDir() {
+    return getBuildDir().dir(Constants.PROJECT_MAIN_CLASS_DIR).get();
+  }
+
   public static Directory getBuildMainDir(DirectoryProperty buildDir) {
     return buildDir.dir(Constants.PROJECT_MAIN_CLASS_DIR).get();
   }
+
+  public Directory getBuildTestDir() {
+    return getBuildDir().dir(Constants.PROJECT_TEST_CLASS_DIR).get();
+  }
+
 
   public static Directory getBuildTestDir(DirectoryProperty buildDir) {
     return buildDir.dir(Constants.PROJECT_TEST_CLASS_DIR).get();
@@ -109,6 +127,10 @@ public class JavaProjectHelper {
 
     final String testpath = testDriverPackage.get().replaceAll("\\.", Constants.FILE_SEPARATOR);
     return outputDir.dir(testpath);
+  }
+
+  public File getDriverDir() {
+    return new File(getProject().getBuildDir(), "driver");
   }
 
   public static File getDriverDir(Project project) {

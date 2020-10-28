@@ -32,7 +32,8 @@ public class SourceGeneratingTask extends AbstractNamedTask {
 
   @TaskAction
   public void generateTestDriverCode() {
-    final File testDriverOutputDir = JavaProjectHelper.getDriverDir(getProject());
+    final JavaProjectHelper projectHelper = new JavaProjectHelper(getProject());
+    final File testDriverOutputDir = projectHelper.getDriverDir();
 
     if (!Files.exists(testDriverOutputDir.toPath())) {
       if (!testDriverOutputDir.mkdir()) {
