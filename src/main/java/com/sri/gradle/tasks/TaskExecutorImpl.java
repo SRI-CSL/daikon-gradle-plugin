@@ -30,8 +30,9 @@ public class TaskExecutorImpl implements TaskExecutor {
 
   @Override
   public TaskBuilder runDaikonOn(InputProvider provider) {
-    Preconditions.checkArgument(provider != null);
-    Preconditions.checkArgument(provider.size() == 2 || provider.size() == 3);
+    Preconditions.checkArgument(
+        provider != null
+            && (provider.size() == 2 || provider.size() == 3));
 
     final TaskBuilderImpl builder = new TaskBuilderImpl(provider, this);
     workBuilders.add(builder);
