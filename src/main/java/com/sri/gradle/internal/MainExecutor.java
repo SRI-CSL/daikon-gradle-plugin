@@ -37,11 +37,13 @@ public class MainExecutor {
     Objects.requireNonNull(daikonSpec);
     final FileCollection fullClasspath = daikonSpec.getClasspath();
     project.javaexec(spec -> {
+      spec.setStandardOutput(Constants.SILENT);
       spec.setWorkingDir(daikonSpec.getWorkingDir());
       spec.setClasspath(fullClasspath);
       spec.setMain(Constants.DAIKON_MAIN_CLASS);
       spec.setArgs(Arrays.asList(daikonSpec.getArgs()));
       daikonSpec.getConfigureFork().forEach(forkAction -> forkAction.execute(spec));
+      project.getLogger().debug(String.join(" ", spec.getCommandLine()));
     });
   }
 
@@ -67,11 +69,13 @@ public class MainExecutor {
     Objects.requireNonNull(dynCompSpec);
     final FileCollection fullClasspath = dynCompSpec.getClasspath();
     project.javaexec(spec -> {
+      spec.setStandardOutput(Constants.SILENT);
       spec.setWorkingDir(dynCompSpec.getWorkingDir());
       spec.setClasspath(fullClasspath);
       spec.setMain(Constants.DYN_COMP_MAIN_CLASS);
       spec.setArgs(Arrays.asList(dynCompSpec.getArgs()));
       dynCompSpec.getConfigureFork().forEach(forkAction -> forkAction.execute(spec));
+      project.getLogger().debug(String.join(" ", spec.getCommandLine()));
     });
   }
 
@@ -97,12 +101,13 @@ public class MainExecutor {
     Objects.requireNonNull(chicorySpec);
     final FileCollection fullClasspath = chicorySpec.getClasspath();
     project.javaexec(spec -> {
+      spec.setStandardOutput(Constants.SILENT);
       spec.setWorkingDir(chicorySpec.getWorkingDir());
       spec.setClasspath(fullClasspath);
       spec.setMain(Constants.CHICORY_MAIN_CLASS);
       spec.setArgs(Arrays.asList(chicorySpec.getArgs()));
-      project.getLogger().quiet(String.join(" ", spec.getCommandLine()));
       chicorySpec.getConfigureFork().forEach(forkAction -> forkAction.execute(spec));
+      project.getLogger().debug(String.join(" ", spec.getCommandLine()));
     });
   }
 

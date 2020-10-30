@@ -16,7 +16,6 @@ import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputDirectory;
-import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
@@ -26,14 +25,11 @@ public class RunDaikon extends AbstractNamedTask {
   private final DirectoryProperty outputDir;
   private final DirectoryProperty requires;
   private final Property<String> testDriverPackage;
-  private final Property<Boolean> generateTestDriver;
 
   public RunDaikon() {
     this.outputDir = getProject().getObjects().directoryProperty(); // unchecked warning
     this.requires = getProject().getObjects().directoryProperty(); // unchecked warning
     this.testDriverPackage = getProject().getObjects().property(String.class); // unchecked warning
-    this.generateTestDriver =
-        getProject().getObjects().property(Boolean.class); // unchecked warning
   }
 
   @TaskAction
@@ -44,7 +40,7 @@ public class RunDaikon extends AbstractNamedTask {
     final Directory buildMainDir = projectHelper.getBuildMainDir();
     final Directory buildTestDir = projectHelper.getBuildTestDir();
     final Directory testClassesDir =
-        JavaProjectHelper.getTestClassesDir(getTestDriverPackage(), buildTestDir);
+        JavaProjectHelper.getTestDriverPackageClassesDir(getTestDriverPackage(), buildTestDir);
 
     if (testClassesDir == null) {
       throw new GradleException("Unable to find the test driver directory");
@@ -72,13 +68,16 @@ public class RunDaikon extends AbstractNamedTask {
     }
 
     if (Files.exists(outputDir.toPath())) {
-      getProject().getLogger().debug("Current permissions for outputDir: " + MoreFiles.getPosixFilePermissions(outputDir).toString());
+      if (MoreFiles.fileCount(outputDir.toPath()) >= 3){
+        getProject().getLogger().quiet(Constants.DAIKON_FILES_EXIST);
+        return;
+      }
     }
 
 
-    // If a test driver is needed, fetch the testDriverPackage value; otherwise fetch a null value
-    final String testDriverPackage =
-        getGenerateTestDriver().get() ? getTestDriverPackage().get() : null;
+    // always generate test driver unless there is already a test driver
+    // in the test driver package.
+    final String testDriverPackage = getTestDriverPackage().get();
 
     final RunDaikonConfiguration config =
         new RunDaikonConfiguration(inputDir, testDriverPackage, getProject(), classpath, outputDir);
@@ -87,9 +86,9 @@ public class RunDaikon extends AbstractNamedTask {
     executor.install(config);
     getLogger().debug("Configured RunDaikon task");
 
-    getLogger().debug("About to execute task");
+    getLogger().debug("About to execute Daikon task");
     executor.execute();
-    getLogger().quiet(Constants.SUCCESSFUL_DAIKON_EXECUTION);
+    getLogger().debug("Executed Daikon task");
   }
 
   @OutputDirectory
@@ -105,12 +104,6 @@ public class RunDaikon extends AbstractNamedTask {
   @Input
   public Property<String> getTestDriverPackage() {
     return this.testDriverPackage;
-  }
-
-  @Optional
-  @Input
-  public Property<Boolean> getGenerateTestDriver() {
-    return this.generateTestDriver;
   }
 
   @Override

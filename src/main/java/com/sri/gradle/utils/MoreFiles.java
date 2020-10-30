@@ -1,12 +1,7 @@
 package com.sri.gradle.utils;
 
-import static java.nio.file.attribute.PosixFilePermission.OTHERS_READ;
-import static java.nio.file.attribute.PosixFilePermission.OTHERS_WRITE;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_EXECUTE;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_READ;
-import static java.nio.file.attribute.PosixFilePermission.OWNER_WRITE;
-
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.sri.gradle.Constants;
 import java.io.File;
 import java.io.IOException;
@@ -14,7 +9,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.attribute.PosixFileAttributeView;
 import java.nio.file.attribute.PosixFilePermission;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -22,26 +16,6 @@ import java.util.Set;
 public class MoreFiles {
   private MoreFiles() {
     throw new Error("Cannot be instantiated");
-  }
-
-  /**
-   * Sets a file object as a writable file object.
-   *
-   * @param file the file object
-   * @return true if file was set as writable; false otherwise.
-   */
-  public static boolean setWritable(File file) {
-    try {
-      Objects.requireNonNull(file);
-      final PosixFileAttributeView fileAttributes =
-          Files.getFileAttributeView(file.toPath(), PosixFileAttributeView.class);
-      Objects.requireNonNull(fileAttributes);
-      fileAttributes.setPermissions(EnumSet.of(OWNER_READ, OWNER_WRITE, OWNER_EXECUTE, OTHERS_READ, OTHERS_WRITE));
-    } catch (Exception ignored) {
-      return false;
-    }
-
-    return true;
   }
 
   /**
@@ -62,6 +36,19 @@ public class MoreFiles {
   }
 
   /**
+   * Gets count of files in a directory
+   * @param dir current directory
+   * @return count of files in directory
+   */
+  public static int fileCount(Path dir){
+    try {
+      return Iterables.size(Files.newDirectoryStream(dir));
+    } catch (IOException ignored) {
+      return 0;
+    }
+  }
+
+  /**
    * Deletes file in path.
    *
    * @param path file path
@@ -73,33 +60,34 @@ public class MoreFiles {
     }
   }
 
-  public static List<String> getClassNames(List<File> javaFiles) {
+  public static List<String> getTestClassNames(List<File> javaFiles) {
     return ImmutableStream.listCopyOf(
-        javaFiles.stream().map(MoreFiles::getClassName).filter(Objects::nonNull));
+        javaFiles.stream().map(MoreFiles::getTestClassName).filter(Objects::nonNull));
   }
 
-  public static String getClassName(File fromFile) {
+  public static String getTestClassName(File fromFile) {
     if (fromFile == null) throw new IllegalArgumentException("File is null");
 
     try {
       final String canonicalPath = fromFile.getCanonicalPath();
-      return getClassName(canonicalPath);
+      return getClassName(canonicalPath, Constants.PROJECT_TEST_CLASS_DIR, ".class");
     } catch (IOException ignored) {
     }
 
     return null;
   }
 
-  public static String getClassName(String canonicalPath) {
+  public static String getClassName(String baseDirPath, String subdir, String dotExt) {
     String deletingPrefix =
-        canonicalPath.substring(0, canonicalPath.indexOf(Constants.PROJECT_TEST_CLASS_DIR));
-    deletingPrefix = (deletingPrefix + Constants.PROJECT_TEST_CLASS_DIR) + Constants.FILE_SEPARATOR;
+        baseDirPath.substring(0, baseDirPath.indexOf(subdir));
+    deletingPrefix = (deletingPrefix + subdir) + Constants.FILE_SEPARATOR;
 
-    String trimmedCanonicalPath = canonicalPath.replace(deletingPrefix, "");
-    trimmedCanonicalPath =
-        trimmedCanonicalPath
-            .replaceAll(".class", "")
-            .replaceAll(Constants.FILE_SEPARATOR, ".");
+    String trimmedCanonicalPath = baseDirPath.replace(deletingPrefix, "");
+    trimmedCanonicalPath = trimmedCanonicalPath.endsWith(dotExt)
+        ? trimmedCanonicalPath
+        .replaceAll(dotExt, "")
+        .replaceAll(Constants.FILE_SEPARATOR, ".")
+        : trimmedCanonicalPath;
     return trimmedCanonicalPath;
   }
 }

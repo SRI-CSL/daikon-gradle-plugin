@@ -69,13 +69,16 @@ public class TaskExecutorImpl implements TaskExecutor {
     final List<File> classpath = each.getClasspath();
 
     final List<File> allTestClasses =
-        Filefinder.findJavaClasses(classesDir, "$" /*exclude those that contain this symbol*/);
-    final List<String> allClassnames = MoreFiles.getClassNames(allTestClasses);
+        Filefinder.findJavaClasses(
+            classesDir,
+            "$" /*exclude those that contain this symbol*/);
 
-    // TODO(has) Some projects may have more than one test driver. Is there
-    //  a better way to handle the case of multiple test drivers?
+    final List<String> allClassNames =
+        MoreFiles.getTestClassNames(allTestClasses);
+
+    // Let's assume there should be only one test driver.
     String mainClass =
-        allClassnames
+        allClassNames
             .stream()
             .filter(Constants.EXPECTED_JUNIT4_NAME_REGEX.asPredicate())
             .filter(f -> f.endsWith(Constants.TEST_DRIVER))
@@ -100,7 +103,7 @@ public class TaskExecutorImpl implements TaskExecutor {
     // DynComp
     mainExecutor.execDynComp(
         classpath,
-        allClassnames,
+        allClassNames,
         mainClass,
         classesDir,
         outputDir
@@ -109,7 +112,7 @@ public class TaskExecutorImpl implements TaskExecutor {
     // Chicory
     mainExecutor.execChicory(
         classpath,
-        allClassnames,
+        allClassNames,
         mainClass,
         prefix,
         outputDir
@@ -121,6 +124,8 @@ public class TaskExecutorImpl implements TaskExecutor {
         classpath,
         outputDir
     );
+
+    System.out.println(Constants.SUCCESSFUL_DAIKON_EXECUTION);
   }
 
 }

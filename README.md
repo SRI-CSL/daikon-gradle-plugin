@@ -47,12 +47,8 @@ runDaikon {
     testDriverPackage = "com.foo"
     // However, if you are not using Randoop, then you need a TestDriver.
     // This TestDriver should have a static void main method, so Daikon can
-    // executed. Having said that, this plugin can help you generate
-    // this TestDriver. This TestDriver will reside in the package as
-    // the one you specified in the `testDriverPackage` statement.
-    // To generate this TestDriver, all you need to do is to include the
-    // following statement (default value is false):
-    generateTestDriver = true
+    // executed. Having said that, this plugin will automatically generate
+    // this TestDriver for you.
 }
 ```
 

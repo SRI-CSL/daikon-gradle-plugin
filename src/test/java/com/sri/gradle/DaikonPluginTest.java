@@ -26,7 +26,7 @@ public class DaikonPluginTest {
 
   @Test public void testFQNExtractor() {
     final String canonicalPath = "daikon-gradle-plugin/consumer/build/classes/java/test/com/foo/FooStuffTestDriver.class";
-    final String fqn = MoreFiles.getClassName(canonicalPath);
+    final String fqn = MoreFiles.getClassName(canonicalPath, Constants.PROJECT_TEST_CLASS_DIR, ".class");
 
     assertNotNull(fqn);
     assertEquals("com.foo.FooStuffTestDriver", fqn);

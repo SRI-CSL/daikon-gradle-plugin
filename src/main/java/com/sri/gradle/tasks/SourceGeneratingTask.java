@@ -15,9 +15,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import org.gradle.api.GradleException;
-import org.gradle.api.Project;
 import org.gradle.api.file.Directory;
-import org.gradle.api.file.DirectoryProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Internal;
 import org.gradle.api.tasks.TaskAction;
@@ -41,6 +39,14 @@ public class SourceGeneratingTask extends AbstractNamedTask {
       }
     }
 
+    // If the test driver java class exist then don't generate anything
+    String mainClass = projectHelper.findDriverClass().orElse(null);
+
+    if (Constants.TEST_DRIVER_CLASSNAME.equals(mainClass)){
+      getProject().getLogger().quiet(Constants.DRIVER_EXIST);
+      return;
+    }
+
     final File testDriverJavaFile =
         testDriverOutputDir.toPath().resolve(Constants.TEST_DRIVER_CLASSNAME + ".java").toFile();
 
@@ -49,7 +55,7 @@ public class SourceGeneratingTask extends AbstractNamedTask {
     }
 
     final String testDriverPackage = getTestDriverPackage().get();
-    final List<String> testClassNames = getTestClassNames(getProject(), testDriverPackage);
+    final List<String> testClassNames = getTestClassNames(projectHelper, testDriverPackage);
 
     final JavaCode testDriverCode = generateTestDriverCode(testDriverPackage, testClassNames);
     final File writtenTestDriverCode = testDriverCode.writeTo(testDriverOutputDir);
@@ -57,7 +63,7 @@ public class SourceGeneratingTask extends AbstractNamedTask {
       throw new GradleException("Unable to write code; java file is null.");
     }
 
-    getProject().getLogger().quiet(Constants.SUCCESSFUL_CODE_GENERATION);
+    getProject().getLogger().debug(Constants.SUCCESSFUL_CODE_GENERATION);
   }
 
   static JavaCode generateTestDriverCode(
@@ -76,22 +82,20 @@ public class SourceGeneratingTask extends AbstractNamedTask {
         .build();
   }
 
-  static List<String> getTestClassNames(Project project, String testDriverPackage) {
-    Objects.requireNonNull(project);
+  static List<String> getTestClassNames(JavaProjectHelper projectHelper, String testDriverPackage) {
+    Objects.requireNonNull(projectHelper);
     Objects.requireNonNull(testDriverPackage);
 
     if (testDriverPackage.isEmpty()) return ImmutableList.of();
 
-    final DirectoryProperty buildDir = project.getLayout().getBuildDirectory();
-
-    final Directory buildTestDir = buildDir.dir(Constants.PROJECT_TEST_CLASS_DIR).get();
+    final Directory buildTestDir = projectHelper.getBuildTestDir(); // buildDir.dir(Constants.PROJECT_TEST_CLASS_DIR).get();
 
     final String testpath = testDriverPackage.replaceAll("\\.", Constants.FILE_SEPARATOR);
     final Path testClassesDir = buildTestDir.dir(testpath).getAsFile().toPath();
 
     final List<File> allTestClasses =
         Filefinder.findJavaClasses(testClassesDir, "$" /*exclude those that contain this symbol*/);
-    return ImmutableList.copyOf(MoreFiles.getClassNames(allTestClasses));
+    return ImmutableList.copyOf(MoreFiles.getTestClassNames(allTestClasses));
   }
 
   public Property<String> getTestDriverPackage() {

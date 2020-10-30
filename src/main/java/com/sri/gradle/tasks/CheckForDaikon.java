@@ -33,6 +33,8 @@ public class CheckForDaikon extends AbstractNamedTask {
         });
       });
 
+      getProject().getLogger().quiet(Constants.DAIKON_IN_CLASSPATH);
+
     } catch (Exception e) {
       throw new GradleException(Constants.UNEXPECTED_ERROR);
     }

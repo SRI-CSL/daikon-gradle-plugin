@@ -15,7 +15,7 @@ import org.gradle.api.file.FileCollection;
 import org.gradle.api.tasks.compile.ForkOptions;
 import org.gradle.process.JavaForkOptions;
 
-public class BaseExecSpec {
+public class MainExecSpec {
   private final List<Action<JavaForkOptions>> configureFork = new ArrayList<>();
   private FileCollection classpath;
   private String main;

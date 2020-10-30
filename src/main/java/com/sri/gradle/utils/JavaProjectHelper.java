@@ -3,6 +3,7 @@ package com.sri.gradle.utils;
 import com.google.common.collect.ImmutableSet;
 import com.sri.gradle.Constants;
 import java.io.File;
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
@@ -70,6 +71,21 @@ public class JavaProjectHelper {
     return findTask(getProject(), taskName).map(taskType::cast);
   }
 
+  public Directory getProjectDir(){
+    Objects.requireNonNull(getProject());
+    return getProject().getLayout().getProjectDirectory();
+  }
+
+  public Directory getSrcMainDir(){
+    Objects.requireNonNull(getProject());
+    return getProjectDir().dir(Constants.PROJECT_MAIN_SRC_DIR);
+  }
+
+  public Directory getTestMainDir(){
+    Objects.requireNonNull(getProject());
+    return getProjectDir().dir(Constants.PROJECT_TEST_SRC_DIR);
+  }
+
   public DirectoryProperty getBuildDir(){
     Objects.requireNonNull(getProject());
     return getProject().getLayout().getBuildDirectory();
@@ -98,15 +114,11 @@ public class JavaProjectHelper {
     return buildDir.dir(Constants.PROJECT_TEST_CLASS_DIR).get();
   }
 
-  public static Directory getTestClassesDir(
+  public static Directory getTestDriverPackageClassesDir(
       Property<String> testDriverPackage, Directory buildTestDir) {
     Objects.requireNonNull(buildTestDir);
 
-    return getTestDriverOutputDir(testDriverPackage, buildTestDir);
-  }
-
-  public static Directory getTestClassesDir(Property<String> testDriverPackage, Project project) {
-    return getTestClassesDir(testDriverPackage, getBuildTestDir(getBuildDir(project)));
+    return getTestDriverPackageDir(testDriverPackage, buildTestDir);
   }
 
   public static SourceSet getSourceSet(String taskName, Project project) {
@@ -115,7 +127,7 @@ public class JavaProjectHelper {
     return ((SourceSetContainer) project.getProperties().get("sourceSets")).getByName(taskName);
   }
 
-  public static Directory getTestDriverOutputDir(
+  public static Directory getTestDriverPackageDir(
       Property<String> testDriverPackage, Directory outputDir) {
     Objects.requireNonNull(testDriverPackage);
     Objects.requireNonNull(testDriverPackage.get());
@@ -127,6 +139,16 @@ public class JavaProjectHelper {
 
     final String testpath = testDriverPackage.get().replaceAll("\\.", Constants.FILE_SEPARATOR);
     return outputDir.dir(testpath);
+  }
+
+  public Optional<String> findDriverClass(){
+    final List<File> javaDrivers = Filefinder.findJavaFiles(getDriverDir().toPath());
+    return javaDrivers.stream()
+        .map(f -> MoreFiles.getClassName(f.getAbsolutePath(), "driver", ".java"))
+        .filter(Objects::nonNull)
+        .filter(Constants.EXPECTED_JUNIT4_NAME_REGEX.asPredicate())
+        .filter(f -> f.endsWith(Constants.TEST_DRIVER))
+        .findFirst();
   }
 
   public File getDriverDir() {
