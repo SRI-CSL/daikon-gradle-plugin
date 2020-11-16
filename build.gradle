@@ -16,7 +16,7 @@ repositories {
     }
 }
 
-group = 'com.sri'
+group = 'com.sri.gradle.daikon'
 version = '0.0.1-SNAPSHOT'
 
 
